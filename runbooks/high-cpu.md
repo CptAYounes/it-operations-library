@@ -12,9 +12,12 @@ A CPU alert says that demand was high during a window. It does not say whether t
 Windows starting points:
 
 ```powershell
+Get-Counter -ListSet *
 Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 2 -MaxSamples 5
 Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 Name, Id, CPU, WorkingSet64
 ```
+
+Performance-counter set and path names are localised. Use the first command to discover the installed names and substitute the local processor path when the English path is absent.
 
 Linux starting points:
 
@@ -24,7 +27,7 @@ ps -eo pid,ppid,user,stat,pcpu,pmem,etime,comm --sort=-pcpu | head -n 15
 vmstat 1 5
 ```
 
-`CPU` in `Get-Process` is accumulated processor time, not current percentage. A `D` state on Linux points to uninterruptible wait, often I/O, even when load average is high. Use the [platform performance guides](../linux/troubleshooting/performance-investigation.md) for a deeper investigation.
+`CPU` in `Get-Process` is accumulated processor time, not current percentage. A `D` state on Linux points to uninterruptible wait, often I/O, even when load average is high. Continue with the [Windows performance guide](../windows/troubleshooting/performance-investigation.md) or [Linux performance guide](../linux/troubleshooting/performance-investigation.md) for a deeper investigation.
 
 ## Narrow the cause
 

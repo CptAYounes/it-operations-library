@@ -58,12 +58,14 @@ Do not insert, remove or reseat ordinary internal power connectors with input po
 
 Use the [no-POST minimum configuration](no-post-troubleshooting.md) when the machine cannot reach firmware. Otherwise, reduce one load/path at a time while retaining the minimum needed to reproduce the fault.
 
+Do not deliberately reproduce a hard power loss until the service owner has accepted the interruption, current data is backed up and a restore route has been checked. First rule out every stop condition in this guide, especially hot or damaged connectors. Limit a load reproduction to one observed attempt with console access, temperature/power monitoring and an immediate stop threshold. If that attempt causes another uncontrolled shutdown, preserve the evidence and move to substitution or escalation rather than repeating it.
+
 Possible controlled tests include:
 
 1. Remove non-essential USB and externally powered devices.
 2. Disconnect non-boot drives and optional expansion cards after recording topology.
 3. If the CPU/platform provides usable integrated graphics, remove the discrete GPU and test the lower-power graphics path.
-4. Test CPU-only and then a representative GPU/combined load, with monitoring and stop conditions, to see which demand triggers the event.
+4. Where the preceding gate is satisfied, test CPU-only and then a representative GPU/combined load to see which demand triggers the event.
 5. Restore the last known-good configuration after each branch to check repeatability.
 
 A system that starts with the GPU removed may have a GPU fault, GPU cable/connector fault, inadequate PSU, damaged slot or simply lower total demand. Continue isolation before replacing a part.

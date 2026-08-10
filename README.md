@@ -33,10 +33,21 @@ Read-only observation comes before repair. Commands that change services, firmwa
 
 Examples use documentation addresses and neutral or synthetic details. They do not represent customer incidents. Outputs can still reveal usernames, hostnames, addresses, device identifiers or paths, so they must be reviewed before publication.
 
-Some subject knowledge reflects direct hands-on practice; other material is a technical reference or a reproducible lab procedure. The repository does not convert study or lab work into claims of production experience.
+The material is presented as technical reference and reproducible lab procedure, not as a claim about production incidents, customers or employers.
 
 ## Tool validation
 
 Bash and Python utilities are exercised on Debian GNU/Linux 13. The cross-platform PowerShell network check is exercised with PowerShell 7.6, while Windows-only PowerShell tools are parser-checked here and explicitly not claimed as Windows execution-tested. The committed validation and smoke-test utilities check required artifacts, relative links, script behaviour and common secret signatures without adding runtime dependencies to the tools themselves.
+
+From the repository root, run the dependency-free checks with:
+
+```console
+$ python3 tests/validate-repository.py
+Repository validation passed: 115 required files, 102 Markdown files, no broken relative links or secret signatures.
+$ python3 tests/smoke-tools.py
+Tool smoke tests passed.
+```
+
+The checks require Python 3.10 syntax and are exercised here with Python 3.13. Smoke coverage also uses the local Bash, Linux utilities and PowerShell installation where available. A missing optional platform command is reported as `SKIP`; review every skip and run that branch on a suitable host before relying on the affected tool. Run both commands before proposing a change.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the technical and privacy expectations applied to corrections.

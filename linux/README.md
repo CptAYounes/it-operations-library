@@ -2,7 +2,7 @@
 
 This section collects installation, administration and fault-finding notes for a general-purpose Linux host. The examples favour Debian 13 and systemd, but distribution-specific commands are labelled rather than treated as universal.
 
-Start with observation: identify the host, current state and impact before changing a package, service, network rule or filesystem. Commands shown without `sudo` are intended to be read-only. A command using `sudo` changes state or needs privileged visibility and should be checked against local change and access policy first.
+Start with observation: identify the host, current state and impact before changing a package, service, network rule or filesystem. `sudo` indicates elevated execution, not whether a command changes state: unprivileged commands can also create or modify files. Rely on each procedure's explicit read-only or change boundary, and check privileged work against local change and access policy first.
 
 ## Build and configure
 

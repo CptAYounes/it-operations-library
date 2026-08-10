@@ -16,9 +16,11 @@ Use when a known host cannot be reached from one or more sources. A failed ping 
 | Does the name resolve? | `Resolve-DnsName host.example` | `getent ahosts host.example` | Naming from reachability |
 | Is a route selected? | `Test-NetConnection host.example -InformationLevel Detailed` | `ip route get 192.0.2.10` | Local routing from a remote fault |
 | Is the service port reachable? | `Test-NetConnection host.example -Port 443` | `python3 scripts/python/port_check.py host.example 443` (repository root) | Host path from application/service |
-| Where does the path stop? | `tracert -d 192.0.2.10` | `tracepath -n 192.0.2.10` | A likely boundary, not proof of the failing device |
+| Where does the path stop? | `tracert -d 192.0.2.10` | `tracepath -n 192.0.2.10` (when installed) | A likely boundary, not proof of the failing device |
 
 Use documentation/example addresses in records; substitute the authorised target during real work. See the [layered connectivity workflow](../networking/diagnostics/layered-connectivity-troubleshooting.md) for local link, address, gateway and neighbour checks.
+
+Debian supplies `tracepath` in the optional `iputils-tracepath` package. If it is not already approved and installed, use an available site-standard path-tracing tool rather than installing software during incident triage. A silent intermediate hop is not proof that the device failed to forward application traffic.
 
 If management access is unavailable but an approved console or out-of-band path exists, check:
 

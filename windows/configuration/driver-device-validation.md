@@ -70,10 +70,11 @@ WMI/CIM inventory may omit or normalise some fields. Confirm a suspect device in
 To inspect a specific package without installing it:
 
 ```text
-pnputil /enum-drivers /files
+pnputil /enum-drivers
+DISM.exe /Online /Get-DriverInfo /Driver:oemNN.inf
 ```
 
-The `/files` option is not present on every older Windows build. Use `pnputil /?` to confirm local syntax.
+Take the published name (`oemNN.inf`) from the first command and inspect only that package with the second. Current Windows 11 releases also support `pnputil /enum-drivers /files`, but that option is not available across the full Windows Server 2022/2025 scope. Use `pnputil /?` to confirm local syntax.
 
 ## Install one change at a time
 

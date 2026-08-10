@@ -70,8 +70,10 @@ PowerShell alternatives:
 
 ```powershell
 Get-NetNeighbor
-Test-Connection -TargetName '127.0.0.1' -Count 2
+Test-Connection -ComputerName '127.0.0.1' -Count 2
 ```
+
+`-ComputerName` works in Windows PowerShell 5.1 and is an alias for `-TargetName` in current PowerShell 7 releases.
 
 Ping uses ICMP, which may be filtered. A failed ping is a data point, not proof that a host or application is down. An ARP/neighbor entry only proves local resolution occurred recently; stale/incomplete states need timing and packet-path context.
 

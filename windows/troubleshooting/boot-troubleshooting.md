@@ -111,7 +111,7 @@ Start with non-repairing checks where the running state permits them.
 chkdsk C: /scan
 ```
 
-**Read-only/offline image health check from running Windows:**
+**Read-only component-store health check against the running Windows image:**
 
 ```text
 DISM.exe /Online /Cleanup-Image /ScanHealth

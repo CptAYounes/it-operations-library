@@ -12,10 +12,13 @@ High allocation is not automatically memory pressure. Modern operating systems u
 Windows:
 
 ```powershell
+Get-Counter -ListSet *
 Get-Counter '\Memory\Available MBytes','\Memory\Pages/sec' -SampleInterval 2 -MaxSamples 5
 Get-Process | Sort-Object WorkingSet64 -Descending |
     Select-Object -First 10 Name, Id, WorkingSet64, PrivateMemorySize64, CPU
 ```
+
+Performance-counter set and path names are localised. Use the first command to discover the installed names and substitute local memory-counter paths when the English paths are absent. The [Windows performance guide](../windows/troubleshooting/performance-investigation.md) covers counter interpretation in more detail.
 
 Linux:
 
@@ -27,6 +30,8 @@ journalctl -k --since '-2 hours' | grep -i -E 'out of memory|oom|killed process'
 ```
 
 The final command reads kernel messages and searches for OOM evidence; access depends on local policy. `VIRT`/VSZ is address space, not physical memory in use. Cache and shared pages make simple process totals differ from host totals.
+
+For deeper Linux sampling and interpretation, use the [Linux performance guide](../linux/troubleshooting/performance-investigation.md).
 
 ## Work the evidence
 

@@ -40,7 +40,7 @@ Open Windows 11 recovery settings at **Settings > System > Recovery**. **Advance
 | Startup Repair | Boot/startup files | Normally | Not intended | Automated changes; may not fix hardware or OS-wide corruption |
 | Uninstall latest update | Recent servicing regression | Normally | Rolls back update | Security/build rollback; uninstall window/package may be absent |
 | System Restore | Recent driver/config/app change | User files normally | Rolls system state/apps back | Requires a suitable restore point; not a data backup |
-| System Image Recovery / bare-metal restore | Failed OS/disk or known restore point | Restores captured state | Replaces newer state | **Destructive** to target/newer data |
+| System Image Recovery / bare-metal restore | Failed OS/disk with a known-good image or bare-metal backup | Restores captured state | Replaces newer state | **Destructive** to target/newer data |
 | Reset this PC — Keep my files | Windows 11 OS corruption | Designed to retain personal files | Yes | Client feature; still back up first |
 | Reset this PC — Remove everything | Disposal or unrecoverable client install | No | Yes | **Destructive**; cleaning/data-erasure guarantees need separate verification |
 | Repair install/in-place upgrade | Running client OS component damage | Usually | Intended to retain apps/data | Needs compatible edition/language/build and Windows able to run Setup |
