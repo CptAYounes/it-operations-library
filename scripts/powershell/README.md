@@ -1,0 +1,65 @@
+# PowerShell diagnostic tools
+
+The PowerShell tools collect evidence; they do not repair faults or change configuration. Windows-only scripts use CIM and built-in service cmdlets. `Test-NetworkHealth.ps1` is cross-platform under PowerShell 7.
+
+All four scripts were parsed with PowerShell 7.6.4 on Debian GNU/Linux 13. `Test-NetworkHealth.ps1` was also executed there. The CIM-based system, service and disk scripts have not been executed on Windows in this repository build, so their Windows behaviour should be validated in a lab before relying on them operationally.
+
+Run from a PowerShell prompt. If local policy permits scripts, a typical invocation is:
+
+```powershell
+pwsh -NoProfile -File ./Get-SystemHealth.ps1
+```
+
+Do not weaken an organisation's execution policy merely to run these tools.
+
+## `Get-SystemHealth.ps1`
+
+Collects Windows uptime, CPU load, available memory, fixed-volume free space and optional service state.
+
+```powershell
+./Get-SystemHealth.ps1 -DiskWarningPercent 15 -ServiceName W32Time,Dnscache
+```
+
+Example shape:
+
+```text
+Computer: LAB-WS01
+Uptime: 4d 07h 12m
+CPU load: 8%
+Memory free: 61.2% (warning below 10%)
+Volume C: | 48.3% free (118.6 GiB; warning below 15%)
+Service W32Time: Running
+Status: healthy
+```
+
+Exit `0` means no threshold warning, `1` means a capacity or service warning, and `2` means collection could not complete. CPU load is a point-in-time CIM value rather than a sustained performance baseline.
+
+## `Test-NetworkHealth.ps1`
+
+Performs DNS resolution, a bounded ICMP check and, when requested, a TCP connection.
+
+```powershell
+./Test-NetworkHealth.ps1 -Target example.org -Port 443 -TimeoutSeconds 3
+```
+
+A reachable TCP port returns success even if ICMP is filtered. The tool does not negotiate TLS or send an application request, so it cannot establish application health. Use only against systems you are authorised to check.
+
+## `Get-ServiceHealth.ps1`
+
+Reports Windows service state and configured start mode.
+
+```powershell
+./Get-ServiceHealth.ps1 -Name W32Time,Dnscache
+```
+
+A stopped service returns `1`, while invalid input or an unsupported platform returns `2`. Not every installed service should run continuously; compare the result with its trigger and start mode before treating it as a fault.
+
+## `Get-DiskHealth.ps1`
+
+Checks free capacity on fixed Windows volumes.
+
+```powershell
+./Get-DiskHealth.ps1 -Drive C: -FreeWarningPercent 15
+```
+
+Exit `1` identifies a volume below the threshold or a requested drive that was not found. This script does not inspect SMART data, Storage Spaces health, filesystem errors or storage latency. Capacity is only one part of disk health.
