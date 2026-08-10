@@ -58,22 +58,37 @@ for path in "${paths[@]}"; do
         continue
     fi
 
-    row=$(LC_ALL=C df -P -- "$path" 2>/dev/null | awk 'NR == 2 {gsub(/%/, "", $5); print $2 "\t" $3 "\t" $4 "\t" $5}')
+    if ! row=$(LC_ALL=C df -Pk -- "$path" 2>/dev/null | awk 'NR == 2 {gsub(/%/, "", $5); print $2 "\t" $3 "\t" $4 "\t" $5}'); then
+        printf 'Path: %s | status: unavailable (df query failed)\n' "$path" >&2
+        result=2
+        continue
+    fi
     if [[ -z $row ]]; then
         printf 'Path: %s | status: unavailable (df failed)\n' "$path" >&2
         result=2
         continue
     fi
 
-    IFS=$'\t' read -r total_kib _ available_kib used_percent <<< "$row"
-    if [[ ! $used_percent =~ ^[0-9]+$ ]]; then
+    IFS=$'\t' read -r total_kib used_kib available_kib used_percent <<< "$row"
+    if [[ ! $total_kib =~ ^[0-9]+$ || ! $used_kib =~ ^[0-9]+$ \
+        || ! $available_kib =~ ^[0-9]+$ || ! $used_percent =~ ^[0-9]+$ ]]; then
         printf 'Path: %s | status: unavailable (unexpected df output)\n' "$path" >&2
+        result=2
+        continue
+    fi
+    total_value=$((10#$total_kib))
+    used_kib_value=$((10#$used_kib))
+    available_value=$((10#$available_kib))
+    used_value=$((10#$used_percent))
+    if ((total_value <= 0 || used_kib_value > total_value || available_value > total_value \
+        || used_kib_value + available_value > total_value || used_value > 100)); then
+        printf 'Path: %s | status: unavailable (unexpected df values)\n' "$path" >&2
         result=2
         continue
     fi
 
     state=healthy
-    if ((used_percent >= warning)); then
+    if ((used_value >= warning)); then
         state=warning
         ((result < 1)) && result=1
     fi

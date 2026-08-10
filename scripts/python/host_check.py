@@ -9,6 +9,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import threading
 
 
 def positive_timeout(value: str) -> float:
@@ -21,9 +22,27 @@ def positive_timeout(value: str) -> float:
     return timeout
 
 
-def resolve(host: str, family: int) -> list[str]:
-    records = socket.getaddrinfo(host, None, family, socket.SOCK_STREAM)
-    return list(dict.fromkeys(str(record[4][0]) for record in records))
+def resolve(host: str, family: int, timeout: float) -> list[str]:
+    addresses: list[str] | None = None
+    resolution_error: OSError | None = None
+    completed = threading.Event()
+
+    def worker() -> None:
+        nonlocal addresses, resolution_error
+        try:
+            records = socket.getaddrinfo(host, None, family, socket.SOCK_STREAM)
+            addresses = list(dict.fromkeys(str(record[4][0]) for record in records))
+        except OSError as exc:
+            resolution_error = exc
+        finally:
+            completed.set()
+
+    threading.Thread(target=worker, daemon=True).start()
+    if not completed.wait(timeout):
+        raise TimeoutError(f"resolution exceeded {timeout:.1f}s")
+    if resolution_error is not None:
+        raise resolution_error
+    return addresses or []
 
 
 def ping_command(address: str, timeout: float, ipv6: bool) -> list[str]:
@@ -48,7 +67,7 @@ def parse_args() -> argparse.Namespace:
         "--timeout",
         type=positive_timeout,
         default=2.0,
-        help="ICMP timeout in seconds (default: 2)",
+        help="per-operation timeout for resolution and ICMP in seconds (default: 2)",
     )
     parser.add_argument(
         "--ipv6", action="store_true", help="resolve and check an IPv6 address"
@@ -61,7 +80,10 @@ def main() -> int:
     family = socket.AF_INET6 if args.ipv6 else socket.AF_INET
 
     try:
-        addresses = resolve(args.host, family)
+        addresses = resolve(args.host, family, args.timeout)
+    except TimeoutError as exc:
+        print(f"Error: could not resolve {args.host}: {exc}", file=sys.stderr)
+        return 1
     except socket.gaierror as exc:
         print(f"Error: could not resolve {args.host}: {exc}", file=sys.stderr)
         return 1

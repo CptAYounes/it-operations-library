@@ -37,30 +37,59 @@ if (-not $isWindowsPlatform) {
 }
 
 try {
-    $operatingSystem = Get-CimInstance -ClassName Win32_OperatingSystem
+    $operatingSystems = @(Get-CimInstance -ClassName Win32_OperatingSystem)
     $processors = @(Get-CimInstance -ClassName Win32_Processor)
     $volumes = @(Get-CimInstance -ClassName Win32_LogicalDisk -Filter 'DriveType = 3')
 
-    $uptime = (Get-Date) - $operatingSystem.LastBootUpTime
-    $cpuLoad = if ($processors.Count -gt 0) {
-        [math]::Round(($processors | Measure-Object -Property LoadPercentage -Average).Average, 1)
+    if ($operatingSystems.Count -ne 1) {
+        throw "Expected one operating-system record; received $($operatingSystems.Count)."
     }
-    else {
-        $null
+    $operatingSystem = $operatingSystems[0]
+    if ($null -eq $operatingSystem.LastBootUpTime) {
+        throw 'The operating-system record did not include LastBootUpTime.'
+    }
+    if ($processors.Count -eq 0) {
+        throw 'No processor records were returned.'
+    }
+    if ($volumes.Count -eq 0) {
+        throw 'No fixed-volume records were returned.'
     }
 
+    $uptime = (Get-Date) - $operatingSystem.LastBootUpTime
+    if ($uptime.TotalSeconds -lt 0) {
+        throw 'LastBootUpTime is later than the current time.'
+    }
+    $uptimeDays = [math]::Floor($uptime.TotalDays)
+
+    $cpuValues = @($processors | ForEach-Object {
+        if ($null -eq $_.LoadPercentage) {
+            throw 'A processor record did not include LoadPercentage.'
+        }
+        $loadPercentage = [double]$_.LoadPercentage
+        if ([double]::IsNaN($loadPercentage) -or [double]::IsInfinity($loadPercentage) -or
+            $loadPercentage -lt 0 -or $loadPercentage -gt 100) {
+            throw "A processor record returned invalid LoadPercentage: $loadPercentage."
+        }
+        $loadPercentage
+    })
+    $cpuLoad = [math]::Round(($cpuValues | Measure-Object -Average).Average, 1)
+
+    if ($null -eq $operatingSystem.TotalVisibleMemorySize -or $null -eq $operatingSystem.FreePhysicalMemory) {
+        throw 'The operating-system record did not include memory capacity.'
+    }
     $totalMemoryKiB = [double]$operatingSystem.TotalVisibleMemorySize
     $freeMemoryKiB = [double]$operatingSystem.FreePhysicalMemory
-    $freeMemoryPercent = if ($totalMemoryKiB -gt 0) {
-        [math]::Round(($freeMemoryKiB / $totalMemoryKiB) * 100, 1)
+    if ([double]::IsNaN($totalMemoryKiB) -or [double]::IsInfinity($totalMemoryKiB) -or
+        [double]::IsNaN($freeMemoryKiB) -or [double]::IsInfinity($freeMemoryKiB) -or
+        $totalMemoryKiB -le 0 -or $freeMemoryKiB -lt 0 -or $freeMemoryKiB -gt $totalMemoryKiB) {
+        throw 'The operating-system record returned invalid memory capacity.'
     }
-    else {
-        $null
-    }
+    $freeMemoryPercent = [math]::Round(($freeMemoryKiB / $totalMemoryKiB) * 100, 1)
 
     $warning = $false
+    $collectionIncomplete = $false
     Write-Output "Computer: $env:COMPUTERNAME"
-    Write-Output ('Uptime: {0}d {1:00}h {2:00}m' -f [int]$uptime.TotalDays, $uptime.Hours, $uptime.Minutes)
+    Write-Output ('Uptime: {0}d {1:00}h {2:00}m' -f $uptimeDays, $uptime.Hours, $uptime.Minutes)
     Write-Output "CPU load: $cpuLoad%"
     Write-Output "Memory free: $freeMemoryPercent% (warning below $MemoryWarningPercent%)"
 
@@ -69,14 +98,24 @@ try {
     }
 
     foreach ($volume in $volumes | Sort-Object DeviceID) {
-        if ([double]$volume.Size -le 0) {
+        if ([string]::IsNullOrWhiteSpace([string]$volume.DeviceID) -or $null -eq $volume.Size -or $null -eq $volume.FreeSpace) {
             Write-Output "Volume $($volume.DeviceID) | capacity unavailable"
-            $warning = $true
+            $collectionIncomplete = $true
             continue
         }
 
-        $freePercent = [math]::Round(([double]$volume.FreeSpace / [double]$volume.Size) * 100, 1)
-        $freeGiB = [math]::Round([double]$volume.FreeSpace / 1GB, 1)
+        $sizeBytes = [double]$volume.Size
+        $freeBytes = [double]$volume.FreeSpace
+        if ([double]::IsNaN($sizeBytes) -or [double]::IsInfinity($sizeBytes) -or
+            [double]::IsNaN($freeBytes) -or [double]::IsInfinity($freeBytes) -or
+            $sizeBytes -le 0 -or $freeBytes -lt 0 -or $freeBytes -gt $sizeBytes) {
+            Write-Output "Volume $($volume.DeviceID) | capacity unavailable"
+            $collectionIncomplete = $true
+            continue
+        }
+
+        $freePercent = [math]::Round(($freeBytes / $sizeBytes) * 100, 1)
+        $freeGiB = [math]::Round($freeBytes / 1GB, 1)
         Write-Output "Volume $($volume.DeviceID) | $freePercent% free ($freeGiB GiB; warning below $DiskWarningPercent%)"
         if ($freePercent -lt $DiskWarningPercent) {
             $warning = $true
@@ -85,7 +124,11 @@ try {
 
     foreach ($name in $ServiceName) {
         try {
-            $service = Get-Service -Name $name -ErrorAction Stop
+            $services = @(Get-Service -Name $name -ErrorAction Stop)
+            if ($services.Count -ne 1) {
+                throw "Expected one service record; received $($services.Count)."
+            }
+            $service = $services[0]
             Write-Output "Service $($service.Name): $($service.Status)"
             if ($service.Status -ne 'Running') {
                 $warning = $true
@@ -97,6 +140,10 @@ try {
         }
     }
 
+    if ($collectionIncomplete) {
+        Write-Output 'Status: incomplete'
+        exit 2
+    }
     if ($warning) {
         Write-Output 'Status: warning'
         exit 1

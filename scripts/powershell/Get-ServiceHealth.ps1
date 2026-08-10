@@ -35,10 +35,27 @@ foreach ($serviceName in $Name) {
     }
 
     try {
-        $service = Get-Service -Name $serviceName -ErrorAction Stop
+        $services = @(Get-Service -Name $serviceName -ErrorAction Stop)
+        if ($services.Count -ne 1) {
+            throw "Expected one service record; received $($services.Count)."
+        }
+        $service = $services[0]
+    }
+    catch {
+        Write-Output "Service ${serviceName}: unavailable ($($_.Exception.Message))"
+        if ($result -lt 1) {
+            $result = 1
+        }
+        continue
+    }
+
+    try {
         $escapedName = $service.Name.Replace("'", "''")
-        $serviceConfiguration = Get-CimInstance -ClassName Win32_Service -Filter "Name = '$escapedName'"
-        $startMode = if ($null -ne $serviceConfiguration) { $serviceConfiguration.StartMode } else { 'unknown' }
+        $serviceConfigurations = @(Get-CimInstance -ClassName Win32_Service -Filter "Name = '$escapedName'")
+        if ($serviceConfigurations.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$serviceConfigurations[0].StartMode)) {
+            throw "Expected one complete service-configuration record; received $($serviceConfigurations.Count)."
+        }
+        $startMode = $serviceConfigurations[0].StartMode
         $state = if ($service.Status -eq 'Running') { 'healthy' } else { 'warning' }
 
         Write-Output "Service: $($service.Name) | display: $($service.DisplayName) | status: $($service.Status) | start: $startMode | result: $state"
@@ -47,10 +64,8 @@ foreach ($serviceName in $Name) {
         }
     }
     catch {
-        Write-Output "Service ${serviceName}: unavailable ($($_.Exception.Message))"
-        if ($result -lt 1) {
-            $result = 1
-        }
+        Write-Output "Service $($service.Name): configuration unavailable ($($_.Exception.Message))"
+        $result = 2
     }
 }
 

@@ -29,7 +29,14 @@ if ($env:OS -ne 'Windows_NT') {
 }
 
 try {
-    $volumes = @(Get-CimInstance -ClassName Win32_LogicalDisk -Filter 'DriveType = 3')
+    $allVolumes = @(Get-CimInstance -ClassName Win32_LogicalDisk -Filter 'DriveType = 3')
+    if ($allVolumes.Count -eq 0) {
+        [Console]::Error.WriteLine('No fixed-volume records were returned.')
+        exit 2
+    }
+
+    $volumes = $allVolumes
+    $missing = @()
     if ($Drive.Count -gt 0) {
         $requested = @($Drive | ForEach-Object { $_.ToUpperInvariant() })
         $volumes = @($volumes | Where-Object { $_.DeviceID -in $requested })
@@ -40,23 +47,33 @@ try {
     }
 
     if ($volumes.Count -eq 0) {
-        [Console]::Error.WriteLine('No matching fixed volumes were found.')
-        exit 2
+        exit 1
     }
 
     $warning = $false
+    $collectionIncomplete = $false
     Write-Output "Free-space warning threshold: $FreeWarningPercent%"
 
     foreach ($volume in $volumes | Sort-Object DeviceID) {
-        if ([double]$volume.Size -le 0) {
+        if ([string]::IsNullOrWhiteSpace([string]$volume.DeviceID) -or $null -eq $volume.Size -or $null -eq $volume.FreeSpace) {
             Write-Output "Volume $($volume.DeviceID) | capacity unavailable"
-            $warning = $true
+            $collectionIncomplete = $true
             continue
         }
 
-        $freePercent = [math]::Round(([double]$volume.FreeSpace / [double]$volume.Size) * 100, 1)
-        $freeGiB = [math]::Round([double]$volume.FreeSpace / 1GB, 1)
-        $sizeGiB = [math]::Round([double]$volume.Size / 1GB, 1)
+        $sizeBytes = [double]$volume.Size
+        $freeBytes = [double]$volume.FreeSpace
+        if ([double]::IsNaN($sizeBytes) -or [double]::IsInfinity($sizeBytes) -or
+            [double]::IsNaN($freeBytes) -or [double]::IsInfinity($freeBytes) -or
+            $sizeBytes -le 0 -or $freeBytes -lt 0 -or $freeBytes -gt $sizeBytes) {
+            Write-Output "Volume $($volume.DeviceID) | capacity unavailable"
+            $collectionIncomplete = $true
+            continue
+        }
+
+        $freePercent = [math]::Round(($freeBytes / $sizeBytes) * 100, 1)
+        $freeGiB = [math]::Round($freeBytes / 1GB, 1)
+        $sizeGiB = [math]::Round($sizeBytes / 1GB, 1)
         $state = if ($freePercent -lt $FreeWarningPercent) { 'warning' } else { 'healthy' }
         Write-Output "Volume: $($volume.DeviceID) | free: $freeGiB GiB of $sizeGiB GiB ($freePercent%) | status: $state"
         if ($state -eq 'warning') {
@@ -64,7 +81,10 @@ try {
         }
     }
 
-    if ($warning -or ($Drive.Count -gt 0 -and $missing.Count -gt 0)) {
+    if ($collectionIncomplete) {
+        exit 2
+    }
+    if ($warning -or $missing.Count -gt 0) {
         exit 1
     }
     exit 0

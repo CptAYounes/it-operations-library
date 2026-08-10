@@ -35,7 +35,7 @@ Path: / | used: 36% | available: 11223344 KiB | total: 20971520 KiB | status: he
 Path: /var | used: 41% | available: 6182912 KiB | total: 10485760 KiB | status: healthy
 ```
 
-Exit `0` means every path is below the threshold, `1` reports at least one threshold warning, and `2` identifies invalid input or an unreadable path. Values come from GNU `df` and may reflect reserved filesystem blocks differently from application-level free-space views.
+Exit `0` means every path is below the threshold, `1` reports at least one threshold warning, and `2` identifies invalid input or an unreadable path. Values come from GNU `df -Pk`, which forces 1024-byte units even when `DF_BLOCK_SIZE`, `BLOCK_SIZE` or `POSIXLY_CORRECT` is set. Reserved filesystem blocks can still make these values differ from application-level free-space views.
 
 ## `service-check.sh`
 
@@ -64,4 +64,4 @@ ICMP: reply received
 Status: healthy
 ```
 
-Exit `1` indicates resolution, routing or ICMP warning; `2` indicates invalid input or missing prerequisites. A failed ping does not prove the host is down because ICMP may be filtered. The command intentionally does not alter routes, interfaces or resolver settings.
+Exit `1` indicates resolution, routing or ICMP warning; `2` indicates invalid input, an incomplete local query or a missing prerequisite. GNU `timeout` applies the selected limit to resolution and route queries, followed by at most a one-second termination grace; ICMP uses the selected wait directly. A failed ping does not prove the host is down because ICMP may be filtered. The command intentionally does not alter routes, interfaces or resolver settings.

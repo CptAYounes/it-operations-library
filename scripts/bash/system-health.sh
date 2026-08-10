@@ -91,10 +91,13 @@ else
 fi
 
 if command -v df >/dev/null 2>&1; then
-    disk_percent=$(LC_ALL=C df -P / 2>/dev/null | awk 'NR == 2 {gsub(/%/, "", $5); print $5}')
-    if [[ $disk_percent =~ ^[0-9]+$ ]]; then
-        printf 'Disk / used: %d%% (warning at %d%%)\n' "$disk_percent" "$disk_warning"
-        if ((disk_percent >= disk_warning)); then
+    if ! disk_percent=$(LC_ALL=C df -P / 2>/dev/null | awk 'NR == 2 {gsub(/%/, "", $5); print $5}'); then
+        printf 'Disk / used: unavailable (df query failed)\n'
+        incomplete=1
+    elif [[ $disk_percent =~ ^[0-9]+$ ]] && ((10#$disk_percent <= 100)); then
+        disk_percent_value=$((10#$disk_percent))
+        printf 'Disk / used: %d%% (warning at %d%%)\n' "$disk_percent_value" "$disk_warning"
+        if ((disk_percent_value >= disk_warning)); then
             status=warning
         fi
     else
@@ -107,13 +110,17 @@ else
 fi
 
 if command -v systemctl >/dev/null 2>&1 && [[ -d /run/systemd/system ]]; then
-    failed_services=$(systemctl --failed --type=service --no-legend --plain --no-pager 2>/dev/null || true)
-    if [[ -n $failed_services ]]; then
-        failed_count=$(printf '%s\n' "$failed_services" | wc -l)
-        printf 'Failed systemd services: %d\n' "$failed_count"
-        status=warning
+    if failed_services=$(systemctl --failed --type=service --no-legend --plain --no-pager 2>/dev/null); then
+        if [[ -n $failed_services ]]; then
+            failed_count=$(printf '%s\n' "$failed_services" | wc -l)
+            printf 'Failed systemd services: %d\n' "$failed_count"
+            status=warning
+        else
+            printf 'Failed systemd services: 0\n'
+        fi
     else
-        printf 'Failed systemd services: 0\n'
+        printf 'Failed systemd services: unavailable (systemctl query failed)\n'
+        incomplete=1
     fi
 else
     printf 'Failed systemd services: unavailable (systemd is not active)\n'
@@ -121,10 +128,15 @@ else
 fi
 
 if command -v ip >/dev/null 2>&1; then
-    up_interfaces=$(ip -brief link show up 2>/dev/null | awk '$1 != "lo" {count++} END {print count + 0}')
-    printf 'Non-loopback interfaces administratively up: %d\n' "$up_interfaces"
-    if ((up_interfaces == 0)); then
-        status=warning
+    if link_output=$(ip -brief link show up 2>/dev/null); then
+        up_interfaces=$(awk '$1 != "lo" {count++} END {print count + 0}' <<< "$link_output")
+        printf 'Non-loopback interfaces administratively up: %d\n' "$up_interfaces"
+        if ((up_interfaces == 0)); then
+            status=warning
+        fi
+    else
+        printf 'Non-loopback interfaces administratively up: unavailable (ip query failed)\n'
+        incomplete=1
     fi
 else
     printf 'Non-loopback interfaces administratively up: unavailable (ip not found)\n'

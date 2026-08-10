@@ -34,7 +34,7 @@ Service W32Time: Running
 Status: healthy
 ```
 
-Exit `0` means no threshold warning, `1` means a capacity or service warning, and `2` means collection could not complete. CPU load is a point-in-time CIM value rather than a sustained performance baseline.
+Exit `0` means no threshold warning, `1` means a capacity or service warning, and `2` means collection could not complete. Missing processor, memory or fixed-volume records never produce a healthy result. CPU load is a point-in-time CIM value rather than a sustained performance baseline.
 
 ## `Test-NetworkHealth.ps1`
 
@@ -52,7 +52,7 @@ TCP 443: connection succeeded
 Status: reachable
 ```
 
-A reachable TCP port returns `0` even if ICMP is filtered; a negative requested check returns `1`, and the explicit invalid `-SkipPing` combination returns `2`. The tool does not negotiate TLS or send an application request, so it cannot establish application health. Use only against systems you are authorised to check.
+A reachable TCP port returns `0` even if ICMP is filtered; a negative or timed-out requested check returns `1`, and the explicit invalid `-SkipPing` combination returns `2`. The selected timeout bounds DNS, ICMP and TCP waits. The tool does not negotiate TLS or send an application request, so it cannot establish application health. Use only against systems you are authorised to check.
 
 ## `Get-ServiceHealth.ps1`
 
@@ -67,7 +67,7 @@ Service: W32Time | display: Windows Time | status: Running | start: Manual | res
 Service: Dnscache | display: DNS Client | status: Running | start: Auto | result: healthy
 ```
 
-A stopped service returns `1`; a service name rejected inside the script or an unsupported platform returns `2`. PowerShell parameter-binding/validation errors happen before the script body and normally return `1`. Not every installed service should run continuously; compare the result with its trigger and start mode before treating it as a fault.
+A stopped or missing service returns `1`; an incomplete configuration query, a service name rejected inside the script or an unsupported platform returns `2`. PowerShell parameter-binding/validation errors happen before the script body and normally return `1`. Not every installed service should run continuously; compare the result with its trigger and start mode before treating it as a fault.
 
 ## `Get-DiskHealth.ps1`
 

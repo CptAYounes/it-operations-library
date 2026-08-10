@@ -32,17 +32,21 @@ for unit in "$@"; do
         continue
     fi
 
-    properties=$(systemctl show "$unit" --no-pager \
-        --property=LoadState --property=ActiveState --property=SubState 2>/dev/null)
+    if ! properties=$(systemctl show "$unit" --no-pager \
+        --property=LoadState --property=ActiveState --property=SubState 2>/dev/null); then
+        printf 'Service: %s | status: unavailable (systemctl query failed)\n' "$unit" >&2
+        result=2
+        continue
+    fi
     if [[ -z $properties ]]; then
-        printf 'Service: %s | status: unavailable\n' "$unit" >&2
+        printf 'Service: %s | status: unavailable (empty systemctl response)\n' "$unit" >&2
         result=2
         continue
     fi
 
-    load_state=unknown
-    active_state=unknown
-    sub_state=unknown
+    load_state=''
+    active_state=''
+    sub_state=''
     while IFS='=' read -r key value; do
         case $key in
             LoadState) load_state=$value ;;
@@ -50,6 +54,12 @@ for unit in "$@"; do
             SubState) sub_state=$value ;;
         esac
     done <<< "$properties"
+
+    if [[ -z $load_state || -z $active_state || -z $sub_state ]]; then
+        printf 'Service: %s | status: unavailable (incomplete systemctl response)\n' "$unit" >&2
+        result=2
+        continue
+    fi
 
     state=healthy
     if [[ $load_state != loaded || $active_state != active ]]; then

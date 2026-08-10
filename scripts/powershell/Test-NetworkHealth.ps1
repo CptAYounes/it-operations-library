@@ -35,7 +35,13 @@ if ($SkipPing -and -not $PSBoundParameters.ContainsKey('Port')) {
 }
 
 try {
-    $addresses = @([System.Net.Dns]::GetHostAddresses($Target))
+    $resolveTask = [System.Net.Dns]::GetHostAddressesAsync($Target)
+    if (-not $resolveTask.Wait($TimeoutSeconds * 1000)) {
+        Write-Output "Resolution: timed out after ${TimeoutSeconds}s"
+        Write-Output 'Status: warning'
+        exit 1
+    }
+    $addresses = @($resolveTask.GetAwaiter().GetResult())
     if ($addresses.Count -eq 0) {
         [Console]::Error.WriteLine("No address was returned for $Target.")
         exit 1

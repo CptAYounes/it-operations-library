@@ -26,6 +26,16 @@ def positive_lines(value: str) -> int:
     return lines
 
 
+def positive_bytes(value: str) -> int:
+    try:
+        size = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("max-bytes must be an integer") from exc
+    if not 1 <= size <= 1_000_000_000:
+        raise argparse.ArgumentTypeError("max-bytes must be between 1 and 1000000000")
+    return size
+
+
 def normalise_level(level: str) -> str:
     level = level.upper()
     if level == "FATAL":
@@ -54,6 +64,12 @@ def parse_args() -> argparse.Namespace:
         default=100_000,
         help="maximum number of lines to read from the start (default: 100000)",
     )
+    parser.add_argument(
+        "--max-bytes",
+        type=positive_bytes,
+        default=10_485_760,
+        help="maximum input bytes to read from the start (default: 10485760)",
+    )
     return parser.parse_args()
 
 
@@ -72,23 +88,35 @@ def main() -> int:
     truncated = False
 
     try:
-        with path.open("r", encoding="utf-8", errors="replace") as log_file:
-            for line in log_file:
-                if lines_read >= args.max_lines:
-                    truncated = True
-                    break
-                lines_read += 1
-                for match in LEVEL_PATTERN.finditer(line):
-                    counts[normalise_level(match.group(1))] += 1
-                timestamp = timestamp_from(line)
-                if timestamp:
-                    first_timestamp = first_timestamp or timestamp
-                    last_timestamp = timestamp
+        with path.open("rb") as log_file:
+            data = log_file.read(args.max_bytes + 1)
     except OSError as exc:
         print(f"Error: could not read {path}: {exc}", file=sys.stderr)
         return 1
 
+    if len(data) > args.max_bytes:
+        truncated = True
+        data = data[: args.max_bytes]
+        if b"\n" in data:
+            data = data.rsplit(b"\n", 1)[0] + b"\n"
+        else:
+            data = b""
+    bytes_read = len(data)
+
+    for line in data.decode("utf-8", errors="replace").splitlines():
+        if lines_read >= args.max_lines:
+            truncated = True
+            break
+        lines_read += 1
+        for match in LEVEL_PATTERN.finditer(line):
+            counts[normalise_level(match.group(1))] += 1
+        timestamp = timestamp_from(line)
+        if timestamp:
+            first_timestamp = first_timestamp or timestamp
+            last_timestamp = timestamp
+
     print(f"File: {path}")
+    print(f"Bytes read: {bytes_read}")
     print(f"Lines read: {lines_read}")
     print(f"Input truncated: {'yes' if truncated else 'no'}")
     print(f"First recognised timestamp: {first_timestamp or 'none'}")

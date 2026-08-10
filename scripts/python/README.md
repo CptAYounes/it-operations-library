@@ -8,7 +8,7 @@ The terminal blocks below show example invocations with illustrative output. Hos
 
 ## `host_check.py`
 
-Resolves one host and sends one bounded ICMP echo request. It requires the operating system's `ping` command.
+Resolves one host and sends one bounded ICMP echo request. The selected timeout applies separately to resolution and the ICMP wait. The tool requires the operating system's `ping` command.
 
 ```console
 $ python3 scripts/python/host_check.py --timeout 1 127.0.0.1
@@ -22,13 +22,13 @@ Use `--ipv6` for an IPv6 result. No reply is not proof that a host is unavailabl
 
 ## `port_check.py`
 
-Attempts a TCP connection but sends no application data.
+Attempts a TCP connection but sends no application data. The selected timeout applies to resolution and separately to each attempted address.
 
 ```console
 $ python3 scripts/python/port_check.py --timeout 2 example.org 443
 Host: example.org
 Port: 443/tcp
-Address: 93.184.216.34
+Address: 192.0.2.10
 Result: reachable
 Connection time: 28.4 ms
 ```
@@ -58,8 +58,9 @@ Use `--json` for structured output or `--disk-path PATH` for another mounted fil
 Counts common severity words and recognises ISO-like or traditional syslog timestamps in a plain-text file. It does not print message bodies.
 
 ```console
-$ python3 scripts/python/log_summary.py --max-lines 50000 application.log
+$ python3 scripts/python/log_summary.py --max-lines 50000 --max-bytes 10485760 application.log
 File: application.log
+Bytes read: 148220
 Lines read: 1842
 Input truncated: no
 First recognised timestamp: 2026-08-10T08:00:01Z
@@ -72,4 +73,4 @@ DEBUG: 0
 TRACE: 0
 ```
 
-Labels are counted by text, not by a schema-aware parser; a message containing the word `error` can therefore add to the count even if the source uses a different severity field. The default 100,000-line bound protects against accidental unbounded reads and samples from the start of the file. Logs may contain credentials or personal data even though this tool suppresses message bodies—do not copy raw logs into the repository.
+Labels are counted by text, not by a schema-aware parser; a message containing the word `error` can therefore add to the count even if the source uses a different severity field. The defaults sample at most 100,000 lines and 10 MiB from the start of the file. A partial line at the byte boundary is excluded. Logs may contain credentials or personal data even though this tool suppresses message bodies—do not copy raw logs into the repository.
