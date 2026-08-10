@@ -2,11 +2,13 @@
 
 These scripts collect a small amount of Linux diagnostic evidence without changing configuration. They were exercised on Debian GNU/Linux 13 with Bash 5.2. A warning result is a reason to investigate, not proof of a fault.
 
-Make a script executable with `chmod +x script-name.sh`, or invoke it explicitly with Bash. None requires root for its normal checks.
+The terminal blocks below show example invocations with illustrative output. Hostnames, capacities and percentages are synthetic.
+
+Examples assume the current directory is `scripts/bash`. Make a script executable with `chmod +x script-name.sh`, or invoke it explicitly with Bash. None requires root for its normal checks.
 
 ## `system-health.sh`
 
-Summarises uptime, load, available memory, root-filesystem use, failed systemd services and active network links.
+Summarises uptime, load, available memory, root-filesystem use, failed systemd services and administratively enabled non-loopback interfaces.
 
 ```console
 $ ./system-health.sh --disk-warning 85 --memory-warning 90
@@ -16,7 +18,7 @@ Load average (1/5/15m): 0.12 0.18 0.20
 Memory used: 42% (warning at 90%)
 Disk / used: 36% (warning at 85%)
 Failed systemd services: 0
-Non-loopback interfaces up: 1
+Non-loopback interfaces administratively up: 1
 Status: healthy
 ```
 

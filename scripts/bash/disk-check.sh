@@ -65,7 +65,7 @@ for path in "${paths[@]}"; do
         continue
     fi
 
-    IFS=$'\t' read -r total_kib used_kib available_kib used_percent <<< "$row"
+    IFS=$'\t' read -r total_kib _ available_kib used_percent <<< "$row"
     if [[ ! $used_percent =~ ^[0-9]+$ ]]; then
         printf 'Path: %s | status: unavailable (unexpected df output)\n' "$path" >&2
         result=2

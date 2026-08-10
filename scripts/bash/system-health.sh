@@ -122,12 +122,12 @@ fi
 
 if command -v ip >/dev/null 2>&1; then
     up_interfaces=$(ip -brief link show up 2>/dev/null | awk '$1 != "lo" {count++} END {print count + 0}')
-    printf 'Non-loopback interfaces up: %d\n' "$up_interfaces"
+    printf 'Non-loopback interfaces administratively up: %d\n' "$up_interfaces"
     if ((up_interfaces == 0)); then
         status=warning
     fi
 else
-    printf 'Non-loopback interfaces up: unavailable (ip not found)\n'
+    printf 'Non-loopback interfaces administratively up: unavailable (ip not found)\n'
     incomplete=1
 fi
 

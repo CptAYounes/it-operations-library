@@ -40,8 +40,10 @@ Linux:
 
 ```bash
 ss -lntup
-python3 ../../scripts/python/port_check.py host.example 443
+python3 scripts/python/port_check.py host.example 443
 ```
+
+The script path assumes the command is run from the repository root.
 
 Process information may require elevated access. A TCP scanner result of “open” reaches only step two, while UDP status is often ambiguous without a protocol-aware request.
 

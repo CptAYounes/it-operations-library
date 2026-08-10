@@ -1,7 +1,7 @@
 #requires -Version 7.0
 <#
 .SYNOPSIS
-Performs bounded DNS, ICMP and optional TCP checks.
+Performs DNS resolution plus bounded ICMP and optional TCP checks.
 
 .EXAMPLE
 .\Test-NetworkHealth.ps1 -Target example.org -Port 443 -TimeoutSeconds 3

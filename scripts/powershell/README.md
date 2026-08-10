@@ -4,7 +4,7 @@ The PowerShell tools collect evidence; they do not repair faults or change confi
 
 All four scripts were parsed with PowerShell 7.6.4 on Debian GNU/Linux 13. `Test-NetworkHealth.ps1` was also executed there. The CIM-based system, service and disk scripts have not been executed on Windows in this repository build, so their Windows behaviour should be validated in a lab before relying on them operationally.
 
-Run from a PowerShell prompt. If local policy permits scripts, a typical invocation is:
+The examples assume the current directory is `scripts/powershell`. Run from a PowerShell prompt. If local policy permits scripts, a typical invocation is:
 
 ```powershell
 pwsh -NoProfile -File ./Get-SystemHealth.ps1
@@ -52,7 +52,7 @@ Reports Windows service state and configured start mode.
 ./Get-ServiceHealth.ps1 -Name W32Time,Dnscache
 ```
 
-A stopped service returns `1`, while invalid input or an unsupported platform returns `2`. Not every installed service should run continuously; compare the result with its trigger and start mode before treating it as a fault.
+A stopped service returns `1`; a service name rejected inside the script or an unsupported platform returns `2`. PowerShell parameter-binding/validation errors happen before the script body and normally return `1`. Not every installed service should run continuously; compare the result with its trigger and start mode before treating it as a fault.
 
 ## `Get-DiskHealth.ps1`
 

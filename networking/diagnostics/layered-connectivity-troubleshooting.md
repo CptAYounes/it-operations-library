@@ -73,9 +73,11 @@ Test-NetConnection host.example -Port 443
 ```
 
 ```bash
-python3 ../../scripts/python/port_check.py host.example 443 --timeout 3
+python3 scripts/python/port_check.py host.example 443 --timeout 3
 ss -lntup                           # on the server, when accessible
 ```
+
+The script path assumes the command is run from the repository root.
 
 Timeout, refusal and completed TCP handshake lead to different next checks. UDP usually needs a protocol-specific response.
 

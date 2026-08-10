@@ -14,7 +14,7 @@ The two platforms expose similar questions through different tools. Run only the
 | DNS query | `Resolve-DnsName host.example` | `getent ahosts host.example`; `resolvectl query`; `dig` when installed |
 | ICMP test | `Test-Connection host.example -Count 2` | `ping -c 2 host.example` |
 | Path trace | `tracert -d 192.0.2.20` | `tracepath -n 192.0.2.20` or `traceroute` when installed |
-| TCP port test | `Test-NetConnection host.example -Port 443` | `python3 port_check.py host.example 443` or `nc -vz -w 3 ...` |
+| TCP port test | `Test-NetConnection host.example -Port 443` | `python3 scripts/python/port_check.py host.example 443` from the repository root, or `nc -vz -w 3 ...` |
 | Listening TCP sockets | `Get-NetTCPConnection -State Listen` | `ss -ltnp` |
 | Listening UDP sockets | `Get-NetUDPEndpoint` | `ss -lunp` |
 | Connection/socket state | `Get-NetTCPConnection` | `ss -tanp` |

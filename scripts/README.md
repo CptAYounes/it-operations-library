@@ -14,7 +14,9 @@ Exit codes are intended for simple automation:
 
 - `0` — requested checks completed without a warning;
 - `1` — a negative result or threshold warning needs interpretation;
-- `2` — invalid input, unsupported platform or incomplete collection.
+- `2` — invalid input, unsupported platform or incomplete collection where the script handles that condition explicitly.
+
+PowerShell parameter validation happens before a script body runs; `pwsh -File` normally returns `1` for a binding/validation error even when the script uses `2` for its own precondition failures.
 
 The individual language READMEs document exceptions and platform limits. A healthy result is a snapshot, not proof of future availability; an alert result is evidence to investigate, not a root-cause diagnosis.
 

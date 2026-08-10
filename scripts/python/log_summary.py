@@ -4,10 +4,10 @@
 from __future__ import annotations
 
 import argparse
-from collections import Counter
-from pathlib import Path
 import re
 import sys
+from collections import Counter
+from pathlib import Path
 
 LEVEL_PATTERN = re.compile(r"\b(CRITICAL|FATAL|ERROR|WARN(?:ING)?|INFO|DEBUG|TRACE)\b", re.IGNORECASE)
 TIMESTAMP_PATTERNS = (

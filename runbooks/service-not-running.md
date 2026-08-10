@@ -8,16 +8,16 @@ Use when a required process or service is stopped, failed, repeatedly restarting
 2. Check for planned maintenance, deployment, dependency or configuration changes.
 3. Record status and recent failure detail:
 
-```powershell
-Get-Service -Name W32Time
-Get-WinEvent -FilterHashtable @{LogName='System'; StartTime=(Get-Date).AddMinutes(-30)} -MaxEvents 100
-```
+    ```powershell
+    Get-Service -Name W32Time
+    Get-WinEvent -FilterHashtable @{LogName='System'; StartTime=(Get-Date).AddMinutes(-30)} -MaxEvents 100
+    ```
 
-```bash
-systemctl status --no-pager example.service
-systemctl show example.service -p LoadState -p ActiveState -p SubState -p Result
-journalctl -u example.service --since '-30 minutes' --no-pager
-```
+    ```bash
+    systemctl status --no-pager example.service
+    systemctl show example.service -p LoadState -p ActiveState -p SubState -p Result
+    journalctl -u example.service --since '-30 minutes' --no-pager
+    ```
 
 4. Check resource conditions: free space and inodes, memory pressure, file/port availability and required network/DNS paths.
 5. Identify dependencies and startup ordering. A stopped application can be downstream evidence of a failed database, mount, certificate, account or configuration.

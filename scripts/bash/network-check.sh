@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run bounded route, name-resolution and ICMP checks for one target.
+# Run route and name-resolution checks plus bounded ICMP for one target.
 
 set -uo pipefail
 

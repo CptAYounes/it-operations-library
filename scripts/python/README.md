@@ -4,12 +4,14 @@ These utilities use only the Python standard library and are read-only by defaul
 
 Run a tool with `python3 scripts/python/tool_name.py --help`. Exit `0` means the requested check completed successfully, `1` represents a negative check or input resource that could not be examined, and `2` is used for command-line or missing-tool errors where applicable.
 
+The terminal blocks below show example invocations with illustrative output. Hostnames, addresses, timings, capacities and log counts are synthetic.
+
 ## `host_check.py`
 
 Resolves one host and sends one bounded ICMP echo request. It requires the operating system's `ping` command.
 
 ```console
-$ python3 host_check.py --timeout 1 127.0.0.1
+$ python3 scripts/python/host_check.py --timeout 1 127.0.0.1
 Host: 127.0.0.1
 Resolved address: 127.0.0.1
 ICMP: reply received
@@ -23,7 +25,7 @@ Use `--ipv6` for an IPv6 result. No reply is not proof that a host is unavailabl
 Attempts a TCP connection but sends no application data.
 
 ```console
-$ python3 port_check.py --timeout 2 example.org 443
+$ python3 scripts/python/port_check.py --timeout 2 example.org 443
 Host: example.org
 Port: 443/tcp
 Address: 93.184.216.34
@@ -38,7 +40,7 @@ The displayed address and timing vary by resolver, route and load. A successful 
 Reports OS, architecture, logical CPU count, physical memory and disk capacity. It deliberately omits serial numbers, MAC addresses and interface addresses.
 
 ```console
-$ python3 system_inventory.py
+$ python3 scripts/python/system_inventory.py
 Hostname: lab-node
 Operating system: Linux 6.12.0
 Architecture: x86_64
@@ -56,7 +58,7 @@ Use `--json` for structured output or `--disk-path PATH` for another mounted fil
 Counts common severity words and recognises ISO-like or traditional syslog timestamps in a plain-text file. It does not print message bodies.
 
 ```console
-$ python3 log_summary.py --max-lines 50000 application.log
+$ python3 scripts/python/log_summary.py --max-lines 50000 application.log
 File: application.log
 Lines read: 1842
 Input truncated: no

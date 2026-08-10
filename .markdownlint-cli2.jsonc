@@ -1,0 +1,8 @@
+{
+  "config": {
+    // Keep prose as semantic paragraphs; GitHub handles line wrapping.
+    "MD013": false,
+    // Existing compact table separators render correctly on GitHub.
+    "MD060": false
+  }
+}
