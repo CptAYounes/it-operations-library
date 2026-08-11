@@ -147,7 +147,15 @@ Changing startup type is not a generic repair:
 Set-Service -Name 'ExampleService' -StartupType Automatic
 ```
 
-This **change** should match documented service design. Automatic, Automatic (Delayed Start), Manual/triggered and Disabled are not interchangeable.
+This **change** should match documented service design. Automatic, Automatic (Delayed Start), Manual and Disabled are startup models; they are not interchangeable.
+
+Trigger-start and trigger-stop events are separate service configuration. They can cause a service to start or stop when a registered condition occurs without changing its startup type. Query that configuration read-only before drawing a conclusion:
+
+```text
+sc.exe qtriggerinfo ExampleService
+```
+
+A service with triggers may be healthy while stopped between events. Do not remove triggers or change startup type merely to keep it continuously running; verify the product design and record a rollback first.
 
 ## Actions to avoid as first response
 
