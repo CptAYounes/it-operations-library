@@ -14,10 +14,18 @@ First identify the stage that fails. Power, POST, firmware, bootloader, kernel a
 
 1. Check maintenance, patch and change records before another restart.
 2. Use the approved console. Record exact messages and the last successful stage.
-3. Disconnect newly added non-essential peripherals only if physical work is authorised and shutdown state is safe.
+3. Disconnect newly connected non-essential peripherals only if physical work is authorised and shutdown state is safe.
 4. In firmware, verify the expected storage device and boot entry are visible. Record settings before changing anything.
 5. If a recovery environment is available, inspect rather than repair first:
-   - Windows: WinRE **Troubleshoot > Advanced options**, Startup Repair logs, and `bcdedit`/`diskpart list volume` only when their effect is understood;
+   - Windows: use WinRE **Troubleshoot > Advanced options** and Startup Repair logs. Record boot entries with `bcdedit`. To identify volumes, use the explicit DiskPart sequence below and record volume number, letter, label, filesystem, size and status before exiting:
+
+     ```text
+     diskpart
+     list volume
+     exit
+     ```
+
+     DiskPart is write-capable. In this diagnostic step, do not use `clean`, `format`, `delete`, `create`, `extend`, `shrink`, `assign` or any other state-changing command;
    - Linux: previous boot entries, recovery target, kernel command line, and an approved live/rescue environment.
 6. Check storage health before repeated repair attempts when I/O errors or disappearing devices are present.
 

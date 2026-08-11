@@ -9,7 +9,7 @@ A VLAN separates Layer 2 broadcast domains on shared switching hardware. Communi
 - Some links define a **native/untagged VLAN**. Both ends must agree; relying on implicit defaults makes mismatches harder to see.
 - A VLAN ID has local administrative meaning. It does not by itself provide encryption, authentication or an Internet-wide segment.
 
-Virtual switches, hypervisors and operating systems can add or remove tags too. Document which component owns tagging so two layers do not both tag unexpectedly.
+Virtual switches, hypervisors and operating systems can apply or remove tags too. Document which component owns tagging so two layers do not both tag unexpectedly.
 
 ## Symptoms of a mismatch
 

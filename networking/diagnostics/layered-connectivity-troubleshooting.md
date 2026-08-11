@@ -2,6 +2,17 @@
 
 Use this when an application cannot communicate between a known source and destination. Record the exact source, destination name/address, protocol/port, timestamp, error and expected path before testing.
 
+Use each result to choose the next boundary rather than running every command:
+
+| Finding | Boundary to investigate next |
+|---|---|
+| No carrier or operational link | Local interface, cable/radio, virtual attachment or switch port |
+| Link works but the expected address/route is absent | DHCP/static configuration, prefix, VLAN or route owner |
+| Address connection works but name connection fails | Resolver path, record/view and reachable returned addresses |
+| TCP handshake completes but larger traffic stalls | MTU/PMTUD, retransmissions and required ICMP/ICMPv6 signalling before TLS/application |
+| TCP and transfer complete but the request fails | TLS, proxy, authentication, application or dependency |
+| One source fails while a peer succeeds | Source configuration, policy, selected route or return path |
+
 ## 1. Physical or virtual link
 
 - Is the correct interface administratively and operationally up?
@@ -48,7 +59,7 @@ ip route get 198.51.100.20
 
 ## 4. Route and path
 
-Check the route actually selected from the affected source. Then trace with numeric output where possible; non-responding hops may simply filter probes.
+Check the route actually selected from the affected source. Then trace with numeric output where possible; `-d` on `tracert` and `-n` on `tracepath` suppress reverse-name lookups so DNS delays do not obscure path timing. Non-responding hops may simply filter probes.
 
 ```powershell
 Test-NetConnection 198.51.100.20 -InformationLevel Detailed
@@ -77,9 +88,11 @@ python3 scripts/python/port_check.py host.example 443 --timeout 3
 ss -lntup                           # on the server, when accessible
 ```
 
-The script path assumes the command is run from the repository root.
+The script path is relative to the repository root. From another directory, use the full path or change to the repository root first.
 
 Timeout, refusal and completed TCP handshake lead to different next checks. UDP usually needs a protocol-specific response.
+
+If a small TCP handshake succeeds but TLS or larger transfers stall, inspect retransmissions and path MTU before blaming the application. `tracepath` reports discovered path-MTU evidence on Linux. For a controlled IPv4 test on Windows, compare bounded `ping -f -l <payload-size>` probes without treating their payload size as the link MTU. Broken ICMP “fragmentation needed” or ICMPv6 “Packet Too Big” handling can create a black hole. Packet capture and probe size must stay within approval and data-handling limits.
 
 ## 7. Application and dependencies
 

@@ -1,6 +1,6 @@
 # Shift handover record
 
-Write for the person taking over, not as a diary of the previous shift. Put the most time-sensitive or risky item first.
+Write for the person taking over, not as a diary of the previous shift. Put the most time-sensitive or risky item first and use the [shift handover checklist](../checklists/shift-handover.md) before transferring responsibility.
 
 ## Handover
 

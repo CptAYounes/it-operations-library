@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7.4
 <#
 .SYNOPSIS
 Collects a concise, read-only Windows health summary.
@@ -33,6 +33,19 @@ $ErrorActionPreference = 'Stop'
 $isWindowsPlatform = $env:OS -eq 'Windows_NT'
 if (-not $isWindowsPlatform) {
     [Console]::Error.WriteLine('Get-SystemHealth.ps1 requires Windows.')
+    exit 2
+}
+
+foreach ($name in $ServiceName) {
+    if ([string]::IsNullOrWhiteSpace($name) -or $name.IndexOfAny([char[]]'*?[]') -ge 0) {
+        [Console]::Error.WriteLine('ServiceName values must be non-empty literal service names without wildcard characters.')
+        exit 2
+    }
+}
+
+$systemDrive = [string]$env:SystemDrive
+if ($systemDrive -notmatch '^[A-Za-z]:$') {
+    [Console]::Error.WriteLine('SystemDrive did not identify a Windows system volume.')
     exit 2
 }
 
@@ -88,6 +101,8 @@ try {
 
     $warning = $false
     $collectionIncomplete = $false
+    $systemVolumeSeen = $false
+    $systemVolumeValid = $false
     Write-Output "Computer: $env:COMPUTERNAME"
     Write-Output ('Uptime: {0}d {1:00}h {2:00}m' -f $uptimeDays, $uptime.Hours, $uptime.Minutes)
     Write-Output "CPU load: $cpuLoad%"
@@ -98,6 +113,9 @@ try {
     }
 
     foreach ($volume in $volumes | Sort-Object DeviceID) {
+        if ([string]$volume.DeviceID -ieq $systemDrive) {
+            $systemVolumeSeen = $true
+        }
         if ([string]::IsNullOrWhiteSpace([string]$volume.DeviceID) -or $null -eq $volume.Size -or $null -eq $volume.FreeSpace) {
             Write-Output "Volume $($volume.DeviceID) | capacity unavailable"
             $collectionIncomplete = $true
@@ -116,17 +134,35 @@ try {
 
         $freePercent = [math]::Round(($freeBytes / $sizeBytes) * 100, 1)
         $freeGiB = [math]::Round($freeBytes / 1GB, 1)
+        if ([string]$volume.DeviceID -ieq $systemDrive) {
+            $systemVolumeValid = $true
+        }
         Write-Output "Volume $($volume.DeviceID) | $freePercent% free ($freeGiB GiB; warning below $DiskWarningPercent%)"
         if ($freePercent -lt $DiskWarningPercent) {
             $warning = $true
         }
     }
 
+    if (-not $systemVolumeSeen) {
+        Write-Output "System volume $systemDrive | capacity unavailable (not returned as a fixed volume)"
+        $collectionIncomplete = $true
+    }
+    elseif (-not $systemVolumeValid) {
+        $collectionIncomplete = $true
+    }
+
     foreach ($name in $ServiceName) {
         try {
             $services = @(Get-Service -Name $name -ErrorAction Stop)
+            if ($services.Count -eq 0) {
+                Write-Output "Service ${name}: not found"
+                $warning = $true
+                continue
+            }
             if ($services.Count -ne 1) {
-                throw "Expected one service record; received $($services.Count)."
+                Write-Output "Service ${name}: unavailable (expected one service record; received $($services.Count))"
+                $collectionIncomplete = $true
+                continue
             }
             $service = $services[0]
             Write-Output "Service $($service.Name): $($service.Status)"
@@ -135,8 +171,14 @@ try {
             }
         }
         catch {
-            Write-Output "Service ${name}: unavailable ($($_.Exception.Message))"
-            $warning = $true
+            if ([string]$_.FullyQualifiedErrorId -like 'NoServiceFoundForGivenName*') {
+                Write-Output "Service ${name}: not found"
+                $warning = $true
+            }
+            else {
+                Write-Output "Service ${name}: collection failed ($($_.Exception.Message))"
+                $collectionIncomplete = $true
+            }
         }
     }
 

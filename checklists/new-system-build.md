@@ -90,7 +90,7 @@ Use the [no-POST workflow](../hardware/diagnostics/no-post-troubleshooting.md) i
 
 - [ ] OS installer boots in the intended UEFI mode and targets the positively identified destination drive.
 - [ ] All expected CPU threads, memory capacity, storage, GPU, NIC and other required devices appear in the installed OS.
-- [ ] Device manager/logs contain no unexplained missing device or new hardware-error event.
+- [ ] The OS device inventory or manager and system/hardware logs contain no unexplained missing device or new hardware-error event.
 - [ ] OS boot, controlled shutdown and restart complete without firmware or encryption recovery errors.
 - [ ] At least one cold start completes with consistent component detection.
 - [ ] Idle temperature, fan/pump response and system noise are checked with the case closed.

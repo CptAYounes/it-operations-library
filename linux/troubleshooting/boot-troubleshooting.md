@@ -62,7 +62,7 @@ Bootloader recovery is distribution- and firmware-specific. On Debian/GRUB it ma
 At the GRUB menu, retain the normal entry and note whether an older installed kernel or recovery entry boots. A one-time edit affects only that attempt and can help isolate:
 
 - incorrect `root=` or `resume=` identifiers;
-- a newly added kernel parameter;
+- a newly set kernel parameter;
 - graphics mode setting;
 - a bad current kernel/initramfs versus a wider storage fault.
 

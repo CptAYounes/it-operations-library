@@ -83,6 +83,8 @@ Get-HotFix |
 
 **Read-only — component packages:**
 
+Run the online-image DISM query from an elevated terminal. It reads package state and does not request a servicing change.
+
 ```text
 DISM.exe /Online /Get-Packages /Format:Table
 ```
@@ -135,13 +137,13 @@ If installation fails:
 1. preserve the code, KB, timestamp and update source;
 2. check free space, time, network/proxy, policy and pending restart;
 3. compare Windows Update history and operational events;
-4. run a read-only component-store scan if corruption is plausible:
+4. run a non-repairing component-store scan if corruption is plausible:
 
 ```text
 DISM.exe /Online /Cleanup-Image /ScanHealth
 ```
 
-`/ScanHealth` scans and records component-store corruption; it can take time but does not perform `/RestoreHealth` repairs. Only after evidence supports corruption should an administrator consider:
+`/ScanHealth` scans and records component-store corruption. It can take time and writes servicing logs/diagnostic state against the running image, but it does not perform `/RestoreHealth` repairs. Only after evidence supports corruption should an administrator consider:
 
 ```text
 DISM.exe /Online /Cleanup-Image /RestoreHealth

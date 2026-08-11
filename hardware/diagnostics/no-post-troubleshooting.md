@@ -61,11 +61,11 @@ Disconnect or remove non-essential devices until only the supported minimum rema
 
 Storage is normally unnecessary to reach firmware. Removing it separates a POST fault from a boot-device fault. Photograph or label storage and expansion connections first when topology matters.
 
-If the minimum system reaches POST, add one device or cable at a time until the failure returns. Re-test the last good state before assigning cause.
+If the minimum system reaches POST, reconnect one device or cable at a time until the failure returns. Re-test the last good state before assigning cause.
 
 ### 3. Isolate memory
 
-1. Restore standard memory settings if firmware is accessible; XMP/EXPO and manual tuning add a stability variable.
+1. Restore standard memory settings if firmware is accessible; XMP/EXPO and manual tuning introduce a stability variable.
 2. Reseat one module in the recommended slot.
 3. Test each module individually in that same known-working slot.
 4. If one module works, use it to test the other required slots.

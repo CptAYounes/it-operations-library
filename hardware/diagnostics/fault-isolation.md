@@ -95,7 +95,7 @@ A good test produces different expected outcomes for competing hypotheses.
 | Swap | Modules A and B exchange slots | Error follows A | Both modules must be compatible and state unchanged |
 | Substitute | Compatible known-good PSU installed | Load reset disappears | PSU and all substituted cables form one test path |
 | Cross-test | Suspect GPU tested in a suitable second system | Fault follows card | Can put the second system at risk; compatibility matters |
-| Reduce | Minimum hardware reaches POST | Added device/path causes failure | Lower power draw may mask a PSU fault |
+| Reduce | Minimum hardware reaches POST | Failure returns when a device/path is restored | Lower power draw may mask a PSU fault |
 | Revert | Memory profile returned to defaults | Errors stop | Shows settings sensitivity, not necessarily bad memory |
 | Observe under load | Temperature and clocks captured | Throttle aligns with limit flag | Stress can be disruptive and synthetic |
 
@@ -127,6 +127,8 @@ Use a positive and negative control where practical:
 
 That A/B/A pattern is much stronger than one successful boot after several parts were reseated.
 
+Do not use A/B/A when restoring the suspect state could cause a hard power loss, electrical hazard, data corruption or further device damage. In those cases, keep the safe known-good path in place and use the substitution result, inspection and retained evidence; the specialist power/storage guide takes precedence over reproducing the fault.
+
 ## 7. Use minimum configurations carefully
 
 A minimum configuration reduces interactions and speeds POST isolation. It should be the **vendor-supported** minimum, not an arbitrary collection of parts.
@@ -135,7 +137,7 @@ Label connections before removal, especially storage, fan and front-panel header
 
 If the full system fails but the minimum passes, consider two classes of cause:
 
-1. the added component/path is faulty or incompatible;
+1. the introduced component/path is faulty or incompatible;
 2. the full configuration changes total power, heat, lane sharing, memory-controller load or firmware behaviour.
 
 The second class is why “it works with the GPU removed” does not yet prove a failed GPU.

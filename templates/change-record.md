@@ -70,3 +70,5 @@ A change record should make the intended state, risk and recovery path understan
 - **Stakeholders notified:**
 - **Follow-up / owner / due date:**
 - **Closed (date/time and timezone):**
+
+Do not paste credentials, recovery keys, private infrastructure details or unredacted diagnostic output into this record. Link to an approved evidence location with the correct access controls instead.

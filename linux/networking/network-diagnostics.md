@@ -2,7 +2,7 @@
 
 Work from the host outward. A successful DNS lookup does not prove the application port is reachable; a failed ping does not prove the host is down. Each check should isolate one layer and produce evidence for the next decision.
 
-All commands in the main diagnostic path are read-only. Availability varies by installed packages and network manager.
+The main diagnostic path does not change local network configuration. It does include active probes such as DNS queries, ICMP, TCP connections, TLS handshakes and HTTP requests; these generate traffic and logs and can trigger rate limits or security monitoring. Use only an authorised, non-destructive endpoint and method. Command availability varies by installed packages and network manager.
 
 ## Capture the context
 

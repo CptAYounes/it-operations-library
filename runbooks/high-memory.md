@@ -43,7 +43,7 @@ For deeper Linux sampling and interpretation, use the [Linux performance guide](
 
 ## Corrective action and escalation
 
-Use the application's supported cache, queue or workload control when the cause is known. Restarting may be an authorised mitigation but does not prove a leak or prevent recurrence. Killing a process can lose state; adding swap or changing memory limits can shift failure into severe latency. Treat either as a planned change.
+Use the application's supported cache, queue or workload control when the cause is known. Restarting may be an authorised mitigation but does not prove a leak or prevent recurrence. Killing a process can lose state; increasing swap or changing memory limits can shift failure into severe latency. Treat either as a planned change.
 
 Escalate on OOM kills, possible data loss, rapid uncontrolled growth, a privileged/unknown consumer, cluster-wide pressure, suspected compromise, or when dump/profiling/restart authority is unavailable.
 

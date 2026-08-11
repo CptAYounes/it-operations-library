@@ -1,6 +1,6 @@
 # Physical Assembly
 
-This checklist covers a conventional field-serviceable desktop. Small-form-factor systems, workstations, servers and vendor-integrated liquid cooling can require a different order and specialised service instructions.
+The checklist assumes a conventional field-serviceable desktop. Small-form-factor systems, workstations, servers and vendor-integrated liquid cooling can require a different order or a manufacturer service procedure.
 
 ## Safety and preparation
 

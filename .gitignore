@@ -1,5 +1,6 @@
 # Local environments and generated files
 .venv/
+.venv-validation/
 venv/
 __pycache__/
 *.py[cod]

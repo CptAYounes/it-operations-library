@@ -30,11 +30,11 @@ Summarise:
 
 | Context | Signal | Typical range | Expected peak / duration | Concern begins when |
 |---|---|---|---|---|
-| Normal interactive load |  |  |  |  |
-| Scheduled job |  |  |  |  |
-| Degraded dependency |  |  |  |  |
+| Synthetic weekday lab test, 09:00–17:00 | Request latency (p95, five-minute windows) | 70–110 ms | 150 ms for one window during the test batch | Above 180 ms for two windows, or any matching error-rate rise |
 
-Use ranges and distributions rather than false precision. Where capacity grows, estimate rate and time to an operational limit, then verify the estimate regularly.
+The row is a filled synthetic example, not a local baseline. Copy the columns into an operational record and populate them with measured interactive, scheduled-job and degraded-dependency periods. Use ranges and distributions rather than false precision. Where capacity grows, estimate rate and time to an operational limit, then verify the estimate regularly.
+
+Record degraded-dependency periods separately as comparison evidence; do not allow impaired behaviour to become part of the healthy baseline merely because it recurs.
 
 ## Keep it current
 

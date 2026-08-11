@@ -1,6 +1,6 @@
 # Operations
 
-This section covers the judgement and records around technical work: incident response, escalation, handover, change, patching, backup and recovery.
+Technical work is easier to review when impact, authority, evidence and recovery are recorded alongside the commands. These notes cover incident response, escalation, handover, change, patching, backup and recovery without assuming a particular ticketing platform.
 
 - [Incident handling](incidents/incident-handling.md)
 - [Incident prioritisation](incidents/incident-prioritisation.md)
@@ -15,4 +15,4 @@ This section covers the judgement and records around technical work: incident re
 - [Service validation](maintenance/service-validation.md)
 - [Technical documentation standards](documentation/technical-documentation-standards.md)
 
-The procedures are neutral references. An organisation's incident, security, safety, data handling and change authority takes precedence, especially where customer impact or production access is involved.
+The topics connect. An incident may need escalation and handover; its mitigation may become a controlled change; service validation checks recovery; and root-cause work can continue after impact ends. Use the templates for the record and the subject guide for the reasoning. Local incident, security, data-handling and change authority still takes precedence.

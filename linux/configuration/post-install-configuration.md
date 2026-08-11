@@ -2,7 +2,7 @@
 
 A fresh installer boot is a starting point, not a usable baseline. This procedure turns it into a system whose identity, storage, time, updates, access and exposed services are known. Debian 13 commands are used where the distribution matters.
 
-Work from a local or out-of-band console until remote access has been proven. Capture the before-state first; if an expected command or configuration manager is absent, identify the installed stack rather than adding another one by reflex.
+Work from a local or out-of-band console until remote access has been proven. Capture the before-state first; if an expected command or configuration manager is absent, identify the installed stack rather than installing another one by reflex.
 
 ## Establish the before-state
 
@@ -94,10 +94,18 @@ Only after confirming backup/rollback, free space, repository identity and servi
 ```bash
 sudo apt update
 apt list --upgradable
+apt-get --simulate upgrade
+```
+
+`apt update` refreshes local metadata; it does not install package upgrades. Review the simulated package transaction for removals, new dependencies, held packages and likely service or kernel restarts. Stop if the proposed transaction or recovery path is not approved.
+
+Only after the exact transaction has been reviewed and authorised:
+
+```bash
 sudo apt upgrade
 ```
 
-`apt update` refreshes local metadata; it does not install package upgrades. Review removals, new dependencies, held packages and whether services or the kernel will restart. Follow the full [package management guide](package-management.md) for simulation, recovery and release upgrades.
+Follow the full [package management guide](package-management.md) for recovery, release upgrades and more complex transactions.
 
 ## 5. Accounts and privilege
 

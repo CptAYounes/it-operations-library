@@ -148,7 +148,8 @@ netstat -abno
 
 ```powershell
 Get-NetConnectionProfile
-Get-NetFirewallProfile | Select-Object Name, Enabled, DefaultInboundAction, DefaultOutboundAction
+Get-NetFirewallProfile -PolicyStore ActiveStore |
+    Select-Object Name, Enabled, DefaultInboundAction, DefaultOutboundAction
 Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True |
     Select-Object DisplayName, Direction, Action, Profile
 ```
@@ -159,20 +160,22 @@ Do not disable Windows Firewall to “test.” Instead, inspect the active profi
 
 ## 8. DHCP and controlled changes
 
-On a DHCP client, after preserving `ipconfig /all` and confirming disruption is acceptable:
+On a DHCP client, after preserving `ipconfig /all` and confirming disruption is acceptable, use a local or out-of-band administrator terminal:
 
 ```text
 ipconfig /release <adapter-name>
 ipconfig /renew <adapter-name>
 ```
 
-These are **changes** and can break a remote session. Adapter-name syntax and multi-interface behaviour require care; run locally/out-of-band. Repeated renewals do not repair a wrong VLAN, exhausted scope or blocked relay.
+These are **changes** and can break a remote session. Adapter-name syntax and multi-interface behaviour require care. Repeated renewals do not repair a wrong VLAN, exhausted scope or blocked relay.
 
 For a static client, review effective state with `Get-NetIPConfiguration` and the approved plan. `New-NetIPAddress`, `Set-DnsClientServerAddress`, disabling an adapter and `Restart-NetAdapter` are disruptive configuration changes; do not include guessed values in a generic repair sequence.
 
 ## Reset boundary
 
 These are not first-line diagnostics:
+
+They require an administrator terminal as well as change approval and a proven recovery path.
 
 ```text
 netsh winsock reset

@@ -16,13 +16,31 @@ A firewall decision can occur on the endpoint, a network device, a virtual/cloud
 Windows:
 
 ```powershell
-Get-NetFirewallProfile
-Get-NetFirewallRule -Enabled True |
+Get-NetConnectionProfile
+Get-NetFirewallProfile -PolicyStore ActiveStore
+Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True |
     Select-Object DisplayName, Direction, Action, Profile
 Get-NetTCPConnection -State Listen
 ```
 
-Rules have separate port/address/application filters; the rule summary is not the whole effective match. Use `Get-NetFirewallPortFilter`, `Get-NetFirewallAddressFilter` and policy tooling as needed.
+`ActiveStore` shows the effective policy after local and Group Policy inputs are merged. Rules have separate port, address, application, service and interface filters; the rule summary is not the whole effective match. For one known rule, inspect its associated filters rather than inferring scope from its display name:
+
+```powershell
+$rule = Get-NetFirewallRule -PolicyStore ActiveStore -DisplayName 'Example HTTPS rule'
+$rule | Select-Object DisplayName, Enabled, Direction, Action, Profile
+$rule | Get-NetFirewallPortFilter |
+    Select-Object Protocol, LocalPort, RemotePort
+$rule | Get-NetFirewallAddressFilter |
+    Select-Object LocalAddress, RemoteAddress
+$rule | Get-NetFirewallApplicationFilter |
+    Select-Object Program, Package
+$rule | Get-NetFirewallServiceFilter |
+    Select-Object Service
+$rule | Get-NetFirewallInterfaceTypeFilter |
+    Select-Object InterfaceType
+```
+
+Compare protocol, local port and source/destination addresses with the recorded traffic tuple. Substitute an existing approved rule name; these commands inspect it and do not create a rule.
 
 Linux:
 

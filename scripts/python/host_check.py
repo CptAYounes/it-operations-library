@@ -10,6 +10,9 @@ import socket
 import subprocess
 import sys
 import threading
+import time
+
+SUPPORTED_SYSTEMS = {"Linux", "Windows"}
 
 
 def positive_timeout(value: str) -> float:
@@ -51,10 +54,12 @@ def ping_command(address: str, timeout: float, ipv6: bool) -> list[str]:
         command = ["ping", "-n", "1", "-w", str(round(timeout * 1000))]
         if ipv6:
             command.append("-6")
-    else:
-        command = ["ping", "-n", "-c", "1", "-W", str(max(1, round(timeout)))]
+    elif system == "Linux":
+        command = ["ping", "-n", "-c", "1", "-W", f"{timeout:.3f}"]
         if ipv6:
             command.append("-6")
+    else:
+        raise RuntimeError(f"unsupported platform: {system or 'unknown'}")
     return [*command, address]
 
 
@@ -79,6 +84,14 @@ def main() -> int:
     args = parse_args()
     family = socket.AF_INET6 if args.ipv6 else socket.AF_INET
 
+    system = platform.system()
+    if system not in SUPPORTED_SYSTEMS:
+        print(
+            f"Error: host_check.py does not implement ping syntax for {system or 'this platform'}",
+            file=sys.stderr,
+        )
+        return 2
+
     try:
         addresses = resolve(args.host, family, args.timeout)
     except TimeoutError as exc:
@@ -99,17 +112,23 @@ def main() -> int:
         print("Error: ping command is not available", file=sys.stderr)
         return 2
 
-    command = ping_command(addresses[0], args.timeout, args.ipv6)
+    ping_deadline = time.monotonic() + args.timeout
+    remaining = ping_deadline - time.monotonic()
+    if remaining <= 0:
+        print(f"ICMP: command exceeded {args.timeout:.1f}s")
+        print("Status: warning")
+        return 1
+    command = ping_command(addresses[0], remaining, args.ipv6)
     try:
         result = subprocess.run(
             command,
             check=False,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            timeout=args.timeout + 2,
+            timeout=remaining,
         )
     except subprocess.TimeoutExpired:
-        print(f"ICMP: command exceeded {args.timeout + 2:.1f}s")
+        print(f"ICMP: command exceeded {args.timeout:.1f}s")
         print("Status: warning")
         return 1
     except OSError as exc:

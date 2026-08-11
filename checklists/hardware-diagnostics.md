@@ -20,6 +20,8 @@ Current service/data state:
 - [ ] Smoke, burning/ozone smell, liquid, battery swelling, damaged insulation and hazardous electrical symptoms are explicitly present or absent in the record.
 - [ ] Equipment is isolated and escalated without further power-on when any hazardous condition is present.
 - [ ] Important data and the current storage/RAID/encryption layout are protected before write tests or device movement.
+- [ ] Before any load test that could reproduce a hard power loss, backup readback is verified, no required data exists only on the host, downtime is approved, and a disposable test image or isolated non-essential data disks are used where practical.
+- [ ] A potential power-loss reproduction is limited to one bounded progression with temperatures and connectors observed; the first hard loss, connector heat, odour, discolouration or threshold breach ends testing immediately, with no later stage or repeat attempt.
 - [ ] Warranty, downtime, replacement and production-impact authority are known.
 - [ ] Firmware settings, diagnostic indicators and volatile logs are captured before reset or reseating.
 - [ ] Unique identifiers, credentials, keys and personal/customer information are excluded from shared evidence.

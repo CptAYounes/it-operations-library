@@ -41,7 +41,7 @@ These are not service-level promises and should not be copied into an organisati
 
 ## Record the basis
 
-Write a short, factual reason:
+For example, a synthetic priority note could read:
 
 > High: checkout requests are failing for all test transactions in two regions; no working path is confirmed and error rate is still increasing.
 

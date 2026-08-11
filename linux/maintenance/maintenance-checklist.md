@@ -38,22 +38,29 @@ timedatectl show -p Timezone -p NTPSynchronized
 
 ## Packages and security updates
 
-Debian 13 read-only review:
+Debian 13 initial read-only inventory:
 
 ```bash
 apt-cache policy
-apt list --upgradable
 apt-mark showhold
-apt-get --simulate upgrade
 dpkg --audit
 ```
 
 - [ ] Repository suite, mirror and signing configuration match the intended release.
-- [ ] Proposed installs, removals, holds, service restarts and kernel/boot changes reviewed.
 - [ ] Free space, backup, console and application compatibility checked.
 - [ ] Security updates prioritised according to exposure and risk.
 - [ ] Third-party packages/repositories still have a named purpose and supported update route.
-- [ ] Upgrade approved before running `sudo apt update` / `sudo apt upgrade` (Debian-specific).
+- [ ] Metadata refresh approved before running `sudo apt update` (Debian-specific and state-changing).
+
+After the approved metadata refresh, recalculate the proposed transaction:
+
+```bash
+apt list --upgradable
+apt-get --simulate upgrade
+```
+
+- [ ] Proposed installs, removals, holds, service restarts and kernel/boot changes reviewed against the refreshed metadata.
+- [ ] The exact transaction is approved before running `sudo apt upgrade`.
 - [ ] Distribution release upgrades handled as a separate tested change.
 
 Do not bypass a signature failure or run `autoremove`/`purge` without reviewing every proposed removal. Use [package management](../configuration/package-management.md) for interrupted transactions and validation.

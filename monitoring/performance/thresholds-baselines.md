@@ -12,7 +12,7 @@ Fixed limits are useful where a boundary is meaningful:
 - zero tolerance for a required service being absent;
 - error counts that should never occur.
 
-Include duration. CPU above 90% for one sample and for 20 minutes are different events. Add hysteresis or a separate recovery point so a value near the boundary does not repeatedly open and close an alert.
+Include duration. CPU above 90% for one sample and for 20 minutes are different events. Use hysteresis or a separate recovery point so a value near the boundary does not repeatedly open and close an alert.
 
 ## Baseline-aware thresholds
 
@@ -41,6 +41,22 @@ Dynamic alerts can hide a slow deterioration if the baseline continuously adapts
 | Missing data | Alert, hold last state, or mark unknown? |
 | Ownership | Who can investigate and who can authorise change? |
 | Context | Baseline, recent change and runbook included? |
+
+### Synthetic alert example
+
+| Element | Defined value |
+|---|---|
+| Signal | Failed requests divided by total requests |
+| Scope | Synthetic `lab-web` service |
+| Aggregation | Five-minute error ratio; a window below 100 requests is low-volume/unknown and cannot open or clear the alert |
+| Window | Two consecutive five-minute windows at a defined severity boundary |
+| Severity | Warning at `>= 5%` and `< 15%`; critical at `>= 15%` |
+| Recovery | Below 2% for three consecutive windows, each with at least 100 requests |
+| Missing data | Mark unknown after two missed collection intervals and notify the monitoring owner |
+| Ownership | Lab service owner investigates; change owner approves corrective changes |
+| Context | Request volume, latency, recent change and [alert response workflow](../alerting/alert-response-workflow.md) |
+
+The recovery point below the trigger provides hysteresis. Both warning and critical require two consecutive qualifying windows. The minimum request count prevents one failed request from producing a misleading 100% ratio during an idle period; low volume leaves the state unknown rather than silently clearing it.
 
 ## Tune with outcomes
 

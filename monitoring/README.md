@@ -9,4 +9,4 @@ Monitoring turns system and service behaviour into evidence that can be acted on
 - [Log monitoring fundamentals](logs/log-monitoring-fundamentals.md)
 - [Alert response workflow](alerting/alert-response-workflow.md)
 
-A monitoring design is incomplete until each actionable alert has an owner, context, safe first checks and a way to verify recovery. More collected metrics do not automatically improve reliability.
+A practical starting sequence is to define the user-visible service, select a small set of availability, error, latency and saturation signals, observe them across normal and busy periods, and then set an alert with an owner, safe first checks and a recovery test. Review noisy or unactionable alerts instead of teaching responders to ignore them. When an alert fires, preserve the time window and compare related signals before changing the monitored system.

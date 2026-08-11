@@ -32,7 +32,7 @@ Do not present a destructive one-liner as a casual shortcut.
 
 ## Preserve diagnostic reasoning
 
-Separate reported symptom, direct observation, hypothesis, action and confirmed cause. Add timestamps/timezones where sequence matters. Record failed checks; they prevent repeated work. State uncertainty rather than forcing a clean narrative.
+Separate reported symptom, direct observation, hypothesis, action and confirmed cause. Include timestamps/timezones where sequence matters. Record failed checks; they prevent repeated work. State uncertainty rather than forcing a clean narrative.
 
 ## Structure by task
 
@@ -47,6 +47,18 @@ Do not force every file into one outline or repeat the same explanation across s
 ## Review and maintenance
 
 Verify commands on the stated platform where practical, otherwise use authoritative vendor documentation and avoid a tested claim. Review links, versions, ownership and safety after changes. Remove conflicting obsolete advice rather than leaving several “final” versions.
+
+Record enough metadata to make that review actionable. A small header or repository record can use fields such as:
+
+```text
+Owner: Linux operations documentation
+Applies to: Debian 13 with systemd
+Last technically verified: YYYY-MM-DD
+Review trigger: distribution upgrade, command deprecation or safety correction
+Evidence: approved test record or issue link
+```
+
+Use a role or maintained team name where personal ownership would become stale. A date is not proof of accuracy; it shows when the stated platform and commands were last checked.
 
 A reviewer should ask: Is the starting state clear? Could the reader perform the check safely? Is success observable? Are claims and first-person experience truthful? Could the output leak information? Is there a point to stop and escalate?
 

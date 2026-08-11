@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7.4
 <#
 .SYNOPSIS
 Checks free capacity on fixed Windows volumes.

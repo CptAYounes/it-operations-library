@@ -74,19 +74,29 @@ vssadmin list shadowstorage
 
 Identify the filesystem first. `chkdsk` behaviour and repair options are chiefly relevant to NTFS/FAT family volumes; ReFS uses its own integrity and repair model and does not rely on the same offline CHKDSK workflow.
 
-**Read-only/online NTFS scan:**
+Run CHKDSK, `fsutil` and `Repair-Volume` from an administrator terminal. The commands below may be read-only, diagnostic-state-writing or repairing; each boundary is stated separately.
+
+**Non-fixing initial NTFS status check:**
+
+```text
+chkdsk C:
+```
+
+Without a repair switch, CHKDSK reports status rather than requesting a fix. It still writes diagnostic event/log evidence, and an active volume can produce transient observations.
+
+**Controlled online scan:**
 
 ```text
 chkdsk C: /scan
 ```
 
-PowerShell equivalent:
+PowerShell scan path:
 
 ```powershell
 Repair-Volume -DriveLetter C -Scan
 ```
 
-Despite the verb name, `-Scan` performs an online scan. It may require elevation. Capture exit/result and investigate hardware/provider events before repairing.
+`chkdsk /scan` writes diagnostic state and can perform supported online repair. With CHKDSK, `/forceofflinefix` prevents online repair but queues detected defects for offline fixing. `Repair-Volume -Scan` scans and reports corruption without requesting repair, although the scan still records diagnostic state. Confirm backup, target and change/outage authority before CHKDSK `/scan`; capture the result of either command and investigate hardware/provider events before further repair.
 
 Check NTFS dirty state:
 
@@ -98,6 +108,8 @@ This is read-only. A dirty bit says the volume needs checking; it does not ident
 
 ### Repair levels
 
+- `chkdsk C: /scan` — **controlled online change**, may perform supported online repair; `/forceofflinefix` instead queues detected defects for offline repair.
+- `Repair-Volume -DriveLetter C -Scan` — **controlled scan**, reports corruption without requesting repair but records diagnostic state.
 - `chkdsk C: /spotfix` or `Repair-Volume -SpotFix` — **change**, briefly takes NTFS volume offline where supported.
 - `chkdsk C: /f` — **change**, fixes logical filesystem errors; system volume normally schedules at restart.
 - `chkdsk C: /r` — **change and highly disruptive**, includes `/f` and attempts to locate readable data in bad sectors; can take a long time and stress failing media.

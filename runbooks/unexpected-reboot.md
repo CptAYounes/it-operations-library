@@ -8,7 +8,7 @@ An uptime reset can result from planned maintenance, a clean restart, kernel/sto
 2. Record current uptime and monitoring gap/recovery time.
 3. Check the change calendar, update tooling, automation and platform owner for an intended restart.
 4. Preserve logs and console/platform events around the estimated time. Do not trigger another reboot to see whether it repeats.
-5. If there is a safety, burning smell, unstable power, overheating or repeated reset concern, follow physical safety procedure and escalate.
+5. If there is a burning smell, unstable power, overheating, repeated reset or another safety concern, follow the physical-safety procedure and escalate.
 
 ## Evidence by platform
 

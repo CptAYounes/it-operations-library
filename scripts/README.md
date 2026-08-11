@@ -8,7 +8,7 @@ The tools in this section make routine evidence collection repeatable without tu
 
 ## Safety model
 
-Every script is read-only by default. Network tools still generate DNS, ICMP or TCP traffic, so use them only on hosts you own or are authorised to test. Output can include hostnames, addresses, paths and service names; review it before adding an example to a ticket or public document.
+Every script is read-only by default. Network tools still generate DNS, ICMP or TCP traffic, so use them only on hosts you own or are authorised to test. Output can include hostnames, addresses, paths and service names; review it before including it in a ticket or public document.
 
 Exit codes are intended for simple automation:
 
@@ -16,10 +16,10 @@ Exit codes are intended for simple automation:
 - `1` — a negative result or threshold warning needs interpretation;
 - `2` — invalid input, unsupported platform or incomplete collection where the script handles that condition explicitly.
 
-PowerShell parameter validation happens before a script body runs; `pwsh -File` normally returns `1` for a binding/validation error even when the script uses `2` for its own precondition failures.
-
 The individual language READMEs document exceptions and platform limits. A healthy result is a snapshot, not proof of future availability; an alert result is evidence to investigate, not a root-cause diagnosis.
 
 ## Testing
 
-Bash and Python tools are exercised on Debian GNU/Linux 13. The cross-platform PowerShell network check is exercised with PowerShell 7.6.4 on the same host. Windows-only PowerShell scripts receive parser checks here but are explicitly not described as Windows-tested.
+Bash and Python tools are exercised on Debian GNU/Linux 13. The cross-platform PowerShell network check is exercised there with PowerShell 7.6.4. See each language README for native-platform limits and permission requirements.
+
+Start with the language README, which lists prerequisites, examples and limitations. Run a tool interactively before using its exit code in automation, and retain enough output to explain a warning or incomplete result rather than reducing every non-zero status to “down”.

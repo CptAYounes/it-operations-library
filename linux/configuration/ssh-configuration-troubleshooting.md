@@ -86,15 +86,32 @@ AllowGroups ssh-users
 
 Do not apply this as a block. `AllowGroups` can exclude every user; `PasswordAuthentication no` can remove the last usable route; root-login policy can affect recovery/automation. Authentication can also be governed by PAM, `KbdInteractiveAuthentication`, certificate authorities and `AuthenticationMethods`.
 
-For a small local change, use a governed drop-in name and then validate both syntax and effective settings:
+For a small local change, use this controlled sequence:
 
-```bash
-sudo /usr/sbin/sshd -t
-sudo /usr/sbin/sshd -T | less
-sudo systemctl reload ssh.service
-```
+1. Confirm that the main file includes the intended drop-in directory and note where the `Include` appears:
 
-A reload avoids dropping established sessions in normal OpenSSH operation, but new sessions use the new policy. Test one immediately from an expected client and keep the original session available.
+   ```bash
+   grep -nE '^[[:space:]]*Include[[:space:]]+' /etc/ssh/sshd_config
+   ```
+
+2. Choose a locally governed, root-owned file in `/etc/ssh/sshd_config.d/`. If it already exists, preserve a protected copy and its ownership/mode. Edit with `sudoedit`; do not paste the example policy above as a block.
+3. Validate syntax and compare only the settings being changed with the protected before-state:
+
+   ```bash
+   sudo /usr/sbin/sshd -t
+   sudo /usr/sbin/sshd -T | grep -E '^(permitrootlogin|pubkeyauthentication|passwordauthentication|allowgroups) '
+   ```
+
+4. Stop if syntax fails or any effective value differs from the approved policy. Only after the values are accepted, reload the service:
+
+   ```bash
+   sudo systemctl reload ssh.service
+   ```
+
+5. Keep the original session open and prove a second session from an expected client.
+6. If validation fails, remove the newly created drop-in or restore the protected previous file, run `sshd -t`, reload and prove another session. Record the file, effective values, validation and rollback result.
+
+A reload avoids dropping established sessions in normal OpenSSH operation, but new sessions use the new policy.
 
 For settings inside `Match`, test a representative connection context:
 
@@ -178,7 +195,7 @@ Never request a user's password or private key as troubleshooting evidence.
 
 ## Firewall and port changes
 
-Changing `Port` does not replace authentication controls and only reduces background noise. Before moving or adding a port:
+Changing `Port` does not replace authentication controls and only reduces background noise. Before moving the service or opening another port:
 
 1. confirm the service will listen on it;
 2. allow the intended source through host and upstream firewalls;

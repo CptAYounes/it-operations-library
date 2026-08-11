@@ -83,7 +83,7 @@ Interpret attributes using the drive or platform vendor's documentation:
 - interface CRC/link errors can implicate a cable, connector or signal path rather than the media;
 - corrected events or normal wear indicators become useful when compared with a prior baseline.
 
-A SMART self-test runs inside the drive and can add load. Confirm duration, workload impact and vendor guidance before starting one. Preserve the pre-test log and review the self-test result afterwards.
+A SMART self-test runs inside the drive and can create extra load. Confirm duration, workload impact and vendor guidance before starting one. Preserve the pre-test log and review the self-test result afterwards.
 
 ## Branch A: device not detected or intermittent
 
@@ -111,7 +111,7 @@ For an array, degraded is not the same as protected. Confirm which member failed
 
 First confirm the block device is stable. Filesystem repair on failing media can turn readable metadata into additional writes and obscure the original evidence.
 
-Read-only or online scan examples:
+Controlled scan examples:
 
 **Windows (NTFS):**
 
@@ -119,7 +119,7 @@ Read-only or online scan examples:
 chkdsk X: /scan
 ```
 
-`/scan` is an online NTFS scan. Other filesystems and older Windows versions differ. Options such as `/f`, `/r` or offline repair change state and can require downtime; use them only with backup, authority and a defined recovery path.
+Run CHKDSK from an administrator terminal. `/scan` is an online NTFS **change**: it writes diagnostic state and can perform supported online repair unless `/forceofflinefix` is used to queue detected defects for offline repair. Confirm backup, the exact volume and change authority before running it, especially when media may be failing. Other filesystems and older Windows versions differ; `/f`, `/r` and offline repair are more disruptive and can require downtime.
 
 **Linux:**
 

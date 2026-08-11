@@ -2,7 +2,7 @@
 
 High CPU, low “free” memory and a large load average are observations, not root causes. Establish the affected service and time window, then correlate CPU, runnable tasks, memory pressure, swapping and storage latency.
 
-The commands below observe state but can themselves add load if run at short intervals or over large process sets. Capture a bounded sample and avoid leaving monitors running indefinitely.
+The commands below observe state but can themselves increase load if run at short intervals or over large process sets. Capture a bounded sample and avoid leaving monitors running indefinitely.
 
 ## Define the problem before collecting metrics
 
@@ -58,10 +58,10 @@ The first `vmstat` line commonly represents averages since boot, so do not mix i
 ```bash
 ps -eo pid,ppid,user,stat,etimes,comm,%cpu,%mem --sort=-%cpu
 pidstat -u -p ALL 1 5
-systemd-cgtop
+systemd-cgtop --iterations=5
 ```
 
-`pidstat` is supplied by `sysstat` and may not be installed. `systemd-cgtop` helps attribute resource use to services/containers but may need additional accounting enabled for complete data.
+`pidstat` is supplied by `sysstat` and may not be installed. `systemd-cgtop --iterations=5` takes a bounded five-sample view; it can help attribute resource use to services/containers but may need additional accounting enabled for complete data.
 
 Points that prevent common misreadings:
 

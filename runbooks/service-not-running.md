@@ -9,8 +9,18 @@ Use when a required process or service is stopped, failed, repeatedly restarting
 3. Record status and recent failure detail:
 
     ```powershell
-    Get-Service -Name W32Time
-    Get-WinEvent -FilterHashtable @{LogName='System'; StartTime=(Get-Date).AddMinutes(-30)} -MaxEvents 100
+    $service = Get-Service -Name 'W32Time'
+    $service | Select-Object Name, DisplayName, Status, StartType
+    $servicePattern = @($service.Name, $service.DisplayName) |
+        ForEach-Object { [regex]::Escape($_) }
+    $servicePattern = $servicePattern -join '|'
+    Get-WinEvent -FilterHashtable @{
+        LogName='System'
+        ProviderName='Service Control Manager'
+        StartTime=(Get-Date).AddMinutes(-30)
+    } -MaxEvents 100 |
+        Where-Object Message -Match $servicePattern |
+        Select-Object -First 50 TimeCreated, Id, LevelDisplayName, Message
     ```
 
     ```bash
@@ -22,6 +32,8 @@ Use when a required process or service is stopped, failed, repeatedly restarting
 4. Check resource conditions: free space and inodes, memory pressure, file/port availability and required network/DNS paths.
 5. Identify dependencies and startup ordering. A stopped application can be downstream evidence of a failed database, mount, certificate, account or configuration.
 6. Validate configuration with the application's read-only test command where one exists. Do not assume a successful syntax test proves dependencies are available.
+
+The Windows event query resolves both the service name and its current display name before matching Service Control Manager messages. This avoids discarding common messages that contain only the display name. Also check the service's own operational/application log when it has one; absence from the generic System log does not mean the service recorded no error.
 
 The [Windows service guide](../windows/services/service-troubleshooting.md) and [systemd guide](../linux/systemd/service-operations.md) provide deeper platform detail.
 

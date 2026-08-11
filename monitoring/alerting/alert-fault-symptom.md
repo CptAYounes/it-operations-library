@@ -1,6 +1,6 @@
 # Alert, fault and symptom
 
-These terms describe different things and should not be used interchangeably.
+An alert, a symptom and a fault are related, but they do not mean the same thing.
 
 - **Alert:** a rule reported that observed data met a condition, or required data was absent.
 - **Symptom:** an externally visible or reported effect, such as timeouts or slow login.
@@ -23,7 +23,7 @@ Similarly, a `service stopped` alert may be the direct fault, an intentional mai
 
 ## Response language
 
-Prefer records that preserve confidence:
+In a synthetic example, prefer wording that preserves confidence:
 
 > Monitoring reported root filesystem use at 96% for 10 minutes. Local `df` confirmed 4.1 GiB free; application logs were growing at approximately 900 MiB per hour after a configuration change.
 

@@ -16,10 +16,10 @@ stat /path/to/object
 
 `getent` uses the configured Name Service Switch sources, so it can see directory-backed identities that are not literal lines in `/etc/passwd`. `namei -l` is useful because access to a file also depends on execute/search permission on every parent directory.
 
-For a running process, distinguish the user who launched it from its effective and saved IDs:
+For a running process, distinguish its real, effective and saved user/group IDs:
 
 ```bash
-ps -o pid,user,group,euser,egroup,comm -p PID
+ps -o pid,ruser,rgroup,euser,egroup,suser,sgroup,comm -p PID
 ```
 
 Replace `PID` with an observed process ID. Containers, systemd sandboxing, SELinux/AppArmor and network filesystems can impose controls beyond normal Unix permissions.
@@ -60,16 +60,16 @@ Read-only inventory:
 getent passwd
 getent group
 getent group sudo
-lastlog
+last -n 20
 ```
 
-Some distributions use `wheel` rather than Debian's `sudo` group. Group membership alone does not prove a user has a particular command entitlement; inspect the effective `sudoers` policy with authorised tools.
+`last` is a bounded view of retained login history. Its implementation and database vary by distribution; on systems with the separate tool installed, `lastlog` provides per-account last-login data. Either view can be incomplete when retention is short, remote identity is used or an account has never logged in. Some distributions use `wheel` rather than Debian's `sudo` group. Group membership alone does not prove a user has a particular command entitlement; inspect the effective `sudoers` policy with authorised tools.
 
 Common administrative operations:
 
 ```bash
 sudo adduser newaccount                         # Debian/Ubuntu helper
-sudo useradd --create-home --shell /bin/bash newaccount  # lower-level portable-style tool
+sudo useradd --create-home --shell /bin/bash newaccount  # lower-level shadow-utils example
 sudo groupadd appops
 sudo usermod --append --groups appops newaccount
 sudo passwd --lock newaccount
@@ -78,6 +78,7 @@ sudo chown appuser:appgroup /srv/application
 
 These are examples, not a sequence to run. Important boundaries:
 
+- Verify that the selected shell exists and is approved. `useradd` options and default files come from the installed account-management suite and are not portable to every Unix-like system.
 - `usermod -G appops user` without `--append` replaces supplementary groups and can remove administrative or service access.
 - Group changes usually take effect at the next login. Existing processes retain their credentials.
 - Locking a password does not necessarily stop SSH keys, tokens, scheduled jobs or running sessions.

@@ -28,6 +28,18 @@ A practical rule should account for:
 - software version and message-format changes;
 - a safe sample or link to access-controlled evidence.
 
+### Synthetic end-to-end example
+
+A lab worker process emits a structured event such as:
+
+```text
+timestamp=2026-08-10T12:00:00Z service=example-worker event=job_failed job=demo-42 severity=error
+```
+
+The parser retains timestamp, service, event, job and severity as separate fields. It evaluates the rule every minute. One alert opens when three or more distinct `job_failed` events occur within ten minutes; repeated copies with the same service, event and job are counted in the evidence but do not open duplicate alerts. The failure alert closes after a full ten-minute window with no new failure and a current collector heartbeat. Two missed one-minute collection intervals create a separate source-silence alert; it closes after two consecutive on-time heartbeats.
+
+The alert should include the window, distinct-event count, affected service, last event time, collection state and a link to restricted evidence. Validate it with one approved synthetic event, then the threshold count, a duplicate and a paused lab collector. Confirm one alert opens, duplicate handling is visible, silence is detected and both recovery rules close at the stated boundaries.
+
 ## Protect the logs
 
 Logs can contain usernames, addresses, paths, tokens, submitted data and customer information. Minimise collection, restrict access, encrypt in transit/at rest where required and set retention by policy. Do not solve parsing by copying raw production logs into a public repository or unapproved tool.

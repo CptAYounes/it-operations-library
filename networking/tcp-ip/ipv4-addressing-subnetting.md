@@ -14,6 +14,15 @@ For `192.0.2.77/27`:
 
 These values were calculated from the prefix, not guessed from the decimal address. `192.0.2.0/24` is reserved for documentation, so it is suitable for public examples and should not be configured as a real Internet destination.
 
+For a prefix that ends inside an octet, convert that mask octet into a block size: `256 - mask value`. A `/20` mask is `255.255.240.0`, so the third-octet block size is 16. For a symbolic address written as `A.B.37.44/20`, 37 falls in the 32–47 block:
+
+- network: `A.B.32.0`;
+- broadcast: `A.B.47.255`;
+- conventional host range: `A.B.32.1` through `A.B.47.254`;
+- conventional usable host addresses: 4,094.
+
+The same method works for another non-octet-aligned prefix: find the mask octet that is neither 255 nor 0, calculate its block size, then locate the address octet inside the nearest lower block boundary. Verify the result with an address calculator or OS tool before using it in a change.
+
 Common masks:
 
 | Prefix | Mask | Addresses | Conventional usable hosts* |

@@ -1,6 +1,6 @@
 # Hardware
 
-This section covers the work around a system rather than a particular brand of component: planning a compatible build, assembling it safely, configuring firmware, and reducing a hardware symptom to a defensible fault domain.
+Hardware work starts before a case is opened: prove that parts are compatible, protect data and settings, and decide what result would separate one fault domain from another. The guides then cover safe assembly, firmware and evidence-led component checks without depending on a particular brand.
 
 The guides favour observations that do not change state. Power removal, component removal, firmware resets, stress tests and replacement come later, with explicit stop conditions. A motherboard or system service manual remains the authority for connector locations, supported components, diagnostic codes and disassembly.
 

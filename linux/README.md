@@ -1,6 +1,6 @@
 # Linux operations
 
-This section collects installation, administration and fault-finding notes for a general-purpose Linux host. The examples favour Debian 13 and systemd, but distribution-specific commands are labelled rather than treated as universal.
+These installation, administration and fault-finding notes are for a general-purpose Linux host. Examples favour Debian 13 and systemd, while distribution-specific commands are labelled rather than presented as universal Linux behaviour.
 
 Start with observation: identify the host, current state and impact before changing a package, service, network rule or filesystem. `sudo` indicates elevated execution, not whether a command changes state: unprivileged commands can also create or modify files. Rely on each procedure's explicit read-only or change boundary, and check privileged work against local change and access policy first.
 

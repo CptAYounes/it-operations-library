@@ -29,7 +29,7 @@ sudo du -x -d 1 /var 2>/dev/null | sort -n
 sudo lsof +L1
 ```
 
-`du` needs appropriate permission and may add I/O load. `lsof +L1` finds deleted files still held open, which can explain a mismatch between `df` and visible files. See the [Linux storage guide](../linux/storage/disk-filesystem-investigation.md) or [Windows storage guide](../windows/storage/storage-filesystem-diagnostics.md).
+With GNU `du`, `-x` stays on the filesystem containing `/var` and `-d 1` reports only the first directory level. The `2>/dev/null` redirection hides permission and traversal errors, so treat missing paths as unknown rather than empty. `du` still needs appropriate permission and may increase I/O load. `lsof +L1` finds deleted files still held open, which can explain a mismatch between `df` and visible files. See the [Linux storage guide](../linux/storage/disk-filesystem-investigation.md) or [Windows storage guide](../windows/storage/storage-filesystem-diagnostics.md).
 
 ## Decide what is safe
 

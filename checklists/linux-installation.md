@@ -1,6 +1,6 @@
 # Linux installation sign-off
 
-Use this as the concise C03 build record. For partition planning, Debian installer decisions, recovery boundaries and command examples, follow the detailed [Linux installation checklist](../linux/installation/linux-installation-checklist.md).
+Use this as a reusable installation sign-off. For partition planning, Debian installer decisions, recovery boundaries and command examples, follow the detailed [Linux installation checklist](../linux/installation/linux-installation-checklist.md).
 
 > Formatting or repartitioning a disk destroys data. Stop if the target disk or backup status is uncertain.
 

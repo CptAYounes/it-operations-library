@@ -6,7 +6,7 @@ For fault finding, describe a connection as a path and a tuple:
 source address : source port -> destination address : destination port / protocol
 ```
 
-Add the interface/VLAN, route, time and application action. “The network is down” is too broad to test.
+Record the interface/VLAN, route, time and application action. “The network is down” is too broad to test.
 
 ## What each layer contributes
 

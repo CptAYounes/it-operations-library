@@ -8,6 +8,18 @@ usage() {
     printf 'With no target, the first IPv4 default gateway is checked.\n'
 }
 
+valid_ipv4() {
+    local candidate=$1 octet
+    local -a octets
+
+    [[ $candidate =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]] || return 1
+    IFS=. read -r -a octets <<< "$candidate"
+    ((${#octets[@]} == 4)) || return 1
+    for octet in "${octets[@]}"; do
+        ((10#$octet <= 255)) || return 1
+    done
+}
+
 timeout=2
 target=''
 
@@ -55,12 +67,17 @@ timeout_arguments=(--signal=TERM --kill-after=1s "${timeout}s")
 if [[ -z $target ]]; then
     default_routes=$(timeout "${timeout_arguments[@]}" ip -4 route show default 2>/dev/null)
     route_status=$?
-    if ((route_status != 0)); then
-        printf 'Error: unable to query the IPv4 default route within %ss.\n' "$timeout" >&2
+    if ((route_status == 124 || route_status == 137)); then
+        printf 'Error: IPv4 default-route query timed out after %ss (1s termination grace).\n' "$timeout" >&2
+        exit 2
+    elif ((route_status != 0)); then
+        printf 'Error: IPv4 default-route query failed (status %d).\n' "$route_status" >&2
         exit 2
     fi
     target=$(awk '
-        /^default/ {
+        NF == 0 {next}
+        $1 != "default" {invalid = 1; next}
+        $1 == "default" {
             routes++
             for (field = 1; field < NF; field++) {
                 if ($field == "via") {
@@ -69,11 +86,15 @@ if [[ -z $target ]]; then
                 }
             }
         }
-        END {if (routes == 1 && gateways == 1) print gateway}
+        END {if (!invalid && routes == 1 && gateways == 1) print gateway}
     ' <<< "$default_routes")
     if [[ -z $target ]]; then
         printf 'Error: no target supplied and no single IPv4 default gateway was found.\n' >&2
         printf 'Supply an explicit target for on-link or multipath default routes.\n' >&2
+        exit 2
+    fi
+    if ! valid_ipv4 "$target"; then
+        printf 'Error: default-route query returned an invalid IPv4 gateway.\n' >&2
         exit 2
     fi
 fi
@@ -93,10 +114,14 @@ if ((resolution_status == 124 || resolution_status == 137)); then
     printf 'Resolution: timed out after %ss (1s termination grace)\n' "$timeout"
     printf 'Status: warning\n'
     exit 1
+elif ((resolution_status != 0)); then
+    printf 'Resolution: failed (collector status %d)\n' "$resolution_status"
+    printf 'Status: warning\n'
+    exit 1
 fi
 resolved=$(awk 'NR == 1 {print $1}' <<< "$resolution_output")
-if [[ -z $resolved ]]; then
-    printf 'Resolution: failed\n'
+if [[ -z $resolved ]] || ! valid_ipv4 "$resolved"; then
+    printf 'Resolution: invalid IPv4 address from collector\n'
     printf 'Status: warning\n'
     exit 1
 fi
@@ -108,10 +133,27 @@ if ((route_status == 124 || route_status == 137)); then
     printf 'Route: query timed out after %ss (1s termination grace)\n' "$timeout"
     printf 'Status: warning\n'
     exit 1
+elif ((route_status != 0)); then
+    printf 'Route: unavailable (collector status %d)\n' "$route_status"
+    printf 'Status: warning\n'
+    exit 1
 fi
-route=$(awk 'NR == 1 {$1=$1; print}' <<< "$route_output")
+route=$(awk -v expected="$resolved" '
+    NR == 1 {
+        typed = ($1 == "local" || $1 == "broadcast" || $1 == "multicast" || $1 == "anycast" || $1 == "unicast")
+        destination = ($1 == expected || (typed && $2 == expected))
+        device = 0
+        for (field = 1; field < NF; field++) {
+            if ($field == "dev" && $(field + 1) != "") device = 1
+        }
+        if (destination && device) {
+            $1 = $1
+            print
+        }
+    }
+' <<< "$route_output")
 if [[ -z $route ]]; then
-    printf 'Route: unavailable\n'
+    printf 'Route: malformed collector output\n'
     printf 'Status: warning\n'
     exit 1
 fi

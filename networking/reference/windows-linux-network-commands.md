@@ -14,7 +14,7 @@ The two platforms expose similar questions through different tools. Run only the
 | DNS query | `Resolve-DnsName host.example` | `getent ahosts host.example`; `resolvectl query`; `dig` when installed |
 | ICMP test | `Test-Connection host.example -Count 2` | `ping -c 2 host.example` |
 | Path trace | `tracert -d 192.0.2.20` | `tracepath -n 192.0.2.20` or `traceroute` when installed |
-| TCP port test | `Test-NetConnection host.example -Port 443` | `python3 scripts/python/port_check.py host.example 443` from the repository root, or `nc -vz -w 3 ...` |
+| TCP port test | `Test-NetConnection host.example -Port 443` | `python3 scripts/python/port_check.py host.example 443` from the repository root |
 | Listening TCP sockets | `Get-NetTCPConnection -State Listen` | `ss -ltnp` |
 | Listening UDP sockets | `Get-NetUDPEndpoint` | `ss -lunp` |
 | Connection/socket state | `Get-NetTCPConnection` | `ss -tanp` |
@@ -28,7 +28,7 @@ The two platforms expose similar questions through different tools. Run only the
 - `Test-NetConnection` combines several checks. Read the detailed fields instead of treating its summary as a root cause.
 - `ss -p` and some Windows process/owner details may require elevated access.
 - `tracert`, `tracepath` and `traceroute` use different probes/options. A silent intermediate hop does not prove it failed to forward application traffic.
-- `nc` implementations differ. The repository's Python [port checker](../../scripts/python/port_check.py) provides a consistent bounded TCP check where Python is available.
+- `nc` implementations and timeout flags differ. The repository's Python [port checker](../../scripts/python/port_check.py) provides a consistent bounded TCP check where Python is available.
 - A direct `dig` result can differ from an application's lookup because `getent`/Windows name resolution may consult hosts files, suffix rules or other name services.
 
 For a sequence rather than a lookup table, use the [layered connectivity workflow](../diagnostics/layered-connectivity-troubleshooting.md).

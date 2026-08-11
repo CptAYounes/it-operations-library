@@ -31,23 +31,10 @@ The material is written as a working technical reference. It concentrates on che
 
 Read-only observation comes before repair. Commands that change services, firmware, storage, network policy or boot state are identified as changes and are not presented as universal fixes. Local safety, security, change and escalation rules take precedence, as does vendor documentation for model- or release-specific work.
 
-Examples use documentation addresses and neutral or synthetic details. They do not represent customer incidents. Outputs can still reveal usernames, hostnames, addresses, device identifiers or paths, so they must be reviewed before publication.
+Examples use documentation addresses and neutral or synthetic details; they are not records of real customer or production work. Outputs can still reveal usernames, hostnames, addresses, device identifiers or paths, so they must be reviewed before publication.
 
-The material is presented as technical reference and reproducible lab procedure, not as a claim about production incidents, customers or employers.
+## Quality checks
 
-## Tool validation
+Automated checks cover the planned structure, links, Markdown, scripts and obvious unsafe artifacts. They support technical review rather than replacing it; platform-specific claims, example destinations and publication safety still need a person to inspect them.
 
-Bash and Python utilities are exercised on Debian GNU/Linux 13. The cross-platform PowerShell network check is exercised with PowerShell 7.6, while Windows-only PowerShell tools are parser-checked here and explicitly not claimed as Windows execution-tested. The committed validation and smoke-test utilities check required artifacts, relative links, script behaviour and common secret signatures without adding runtime dependencies to the tools themselves.
-
-From the repository root, run the dependency-free checks with:
-
-```console
-$ python3 tests/validate-repository.py
-Repository validation passed: 115 required files, 102 Markdown files, no broken relative links or secret signatures.
-$ python3 tests/smoke-tools.py
-Tool smoke tests passed.
-```
-
-The checks require Python 3.10 syntax and are exercised here with Python 3.13. Smoke coverage also uses the local Bash, Linux utilities and PowerShell installation where available. A missing optional platform command is reported as `SKIP`; review every skip and run that branch on a suitable host before relying on the affected tool. Run both commands before proposing a change.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the technical and privacy expectations applied to corrections.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the validation commands and the technical and privacy expectations applied to corrections.

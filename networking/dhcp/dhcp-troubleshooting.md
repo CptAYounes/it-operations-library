@@ -6,9 +6,36 @@ DHCP supplies more than an address. A lease can also carry prefix/mask, gateway,
 
 A new client typically moves through Discover, Offer, Request and Acknowledge (DORA). Broadcast is used before normal IPv4 configuration; a DHCP relay forwards requests between a client subnet and a remote server. Renewal later commonly uses unicast before falling back to broader rebinding.
 
+## IPv6 is a separate path
+
+Do not apply DORA or APIPA reasoning to IPv6. Router advertisements provide the default-router information and may support Stateless Address Autoconfiguration (SLAAC). DHCPv6 can provide addresses or other settings over UDP ports 546/547, but it does not supply the IPv6 default gateway. Check link-local addressing, router advertisements, DHCPv6 state and DNS information separately with `Get-NetIPConfiguration` on Windows or `ip -6 address`, `ip -6 route` and the active network manager on Linux.
+
+Read-only Windows evidence:
+
+```powershell
+Get-NetIPConfiguration -Detailed
+Get-NetIPAddress -AddressFamily IPv6 |
+    Select-Object InterfaceAlias, IPAddress, PrefixLength, PrefixOrigin, SuffixOrigin, AddressState
+Get-NetRoute -AddressFamily IPv6 -DestinationPrefix '::/0'
+ipconfig /all
+```
+
+Read-only Linux evidence:
+
+```bash
+ip -6 address
+ip -6 route show default
+resolvectl status
+nmcli device show                 # NetworkManager
+networkctl status                 # systemd-networkd
+journalctl -u NetworkManager -u systemd-networkd --since '-30 minutes'
+```
+
+Record the link-local and global addresses, address origin, default-router source/interface and remaining lifetime where the tool exposes it. `ipconfig /all` can expose DHCPv6 IAID/DUID state; NetworkManager or networkd logs can show DHCPv6 lease and DNS source. Not every client displays RA managed/other flags directly. If those flags are essential, use an authorised, tightly scoped packet capture and protect client identifiers.
+
 ## Start at the client
 
-Windows:
+IPv4 client checks on Windows:
 
 ```powershell
 Get-NetIPConfiguration
@@ -16,7 +43,7 @@ Get-NetIPInterface -AddressFamily IPv4
 ipconfig /all
 ```
 
-Linux (tool depends on network manager):
+IPv4 client checks on Linux (tool depends on network manager):
 
 ```bash
 ip -4 address

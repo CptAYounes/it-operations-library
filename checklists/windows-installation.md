@@ -1,6 +1,6 @@
-# C02 — Windows installation release gate
+# Windows installation sign-off
 
-Use this checklist to confirm that a Windows installation is ready to hand over. It does not replace the detailed [W01 installation procedure](../windows/installation/windows-installation-checklist.md).
+Use this checklist to confirm that a Windows installation is ready to hand over. It does not replace the detailed [installation procedure](../windows/installation/windows-installation-checklist.md).
 
 **Scope:** supported Windows 11 editions and Windows Server 2022/2025. Record the exact product, edition, build and **Server Core/Desktop Experience** choice. GUI steps and available security/recovery features differ by release, edition and installed role.
 

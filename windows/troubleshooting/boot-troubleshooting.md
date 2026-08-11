@@ -105,17 +105,21 @@ A normal UEFI installation uses the EFI System Partition and `\EFI\Microsoft\Boo
 
 Start with non-repairing checks where the running state permits them.
 
-**Read-only/online NTFS scan:**
+**Non-fixing initial NTFS check:**
 
 ```text
-chkdsk C: /scan
+chkdsk C:
 ```
 
-**Read-only component-store health check against the running Windows image:**
+Without a repair switch, CHKDSK reports filesystem status rather than requesting a fix. It still writes diagnostic event/log evidence, and an active volume can produce transient observations; preserve the timestamp and result rather than treating one line as a confirmed cause. `chkdsk C: /scan` is a controlled-change branch, not a read-only substitute: supported online repair can occur unless `/forceofflinefix` is used, and that option queues detected defects for an offline repair. Obtain backup and outage authority before either path.
+
+**Non-repairing component-store scan of the running Windows image:**
 
 ```text
 DISM.exe /Online /Cleanup-Image /ScanHealth
 ```
+
+`/ScanHealth` does not run `/RestoreHealth`, but it is not strictly read-only: DISM records diagnostic state and writes servicing logs while scanning the online image. Preserve the exit code and relevant log window.
 
 From WinRE, if the Windows installation is `D:\Windows`:
 
@@ -125,7 +129,7 @@ sfc.exe /scannow /offbootdir=D:\ /offwindir=D:\Windows
 
 SFC is a **repair** even though it is diagnostic-looking; it can replace protected files. Confirm drive letters and use the Windows volume rather than `X:`. If the installation has a separate system/boot partition, `/offbootdir` may need that partition. Capture the output and CBS log before further changes.
 
-`chkdsk /f`, `/spotfix` and `/r` modify filesystem state; `/r` also performs a long surface/readability scan. Use them only after storage health and backup are considered. A failing physical disk should be imaged/replaced, not stressed by repeated repair scans.
+`chkdsk /f`, `/scan`, `/spotfix` and `/r` can modify or schedule changes to filesystem state; `/r` also performs a long surface/readability scan. Use them only after storage health, backup, outage impact and rollback are considered. A failing physical disk should be imaged/replaced, not stressed by repeated repair scans.
 
 ## Recreate UEFI boot files only with evidence
 

@@ -9,3 +9,5 @@ These blank records keep operational evidence and decisions consistent without i
 - [Shift handover record](shift-handover.md) — current state, open work and next actions
 
 Copy the appropriate template into an authorised work location. Do not commit completed records containing customer data, credentials, private infrastructure details or unique device identifiers to this repository.
+
+Write `unknown` when evidence is missing and `N/A` only when a field cannot apply. A blank field is ambiguous to the next person. Keep reported symptoms separate from direct observations, and give each open action an owner and review time. Before sharing a completed record, remove unnecessary identifiers and confirm that linked logs or screenshots have the same access boundary as the record.

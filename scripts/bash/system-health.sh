@@ -130,10 +130,7 @@ fi
 if command -v ip >/dev/null 2>&1; then
     if link_output=$(ip -brief link show up 2>/dev/null); then
         up_interfaces=$(awk '$1 != "lo" {count++} END {print count + 0}' <<< "$link_output")
-        printf 'Non-loopback interfaces administratively up: %d\n' "$up_interfaces"
-        if ((up_interfaces == 0)); then
-            status=warning
-        fi
+        printf 'Non-loopback interfaces administratively up: %d (inventory only; carrier state not evaluated)\n' "$up_interfaces"
     else
         printf 'Non-loopback interfaces administratively up: unavailable (ip query failed)\n'
         incomplete=1

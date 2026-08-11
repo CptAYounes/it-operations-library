@@ -1,6 +1,6 @@
 # Windows operations notes
 
-This section covers installing, checking and recovering current Windows clients and servers. It is arranged around practical jobs rather than the layout of Control Panel.
+Use these notes to install, check and recover current Windows clients and servers. The material follows practical jobs rather than the layout of Control Panel, so a GUI path and a command-line path may sit together when they answer the same question.
 
 ## Platform and command scope
 

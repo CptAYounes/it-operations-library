@@ -8,7 +8,7 @@ Examples assume the current directory is `scripts/bash`. Make a script executabl
 
 ## `system-health.sh`
 
-Summarises uptime, load, available memory, root-filesystem use, failed systemd services and administratively enabled non-loopback interfaces.
+Summarises uptime, load, available memory, root-filesystem use and failed systemd services. It also inventories administratively enabled non-loopback interfaces without treating that count as a carrier or reachability health signal.
 
 ```console
 $ ./system-health.sh --disk-warning 85 --memory-warning 90
@@ -18,7 +18,7 @@ Load average (1/5/15m): 0.12 0.18 0.20
 Memory used: 42% (warning at 90%)
 Disk / used: 36% (warning at 85%)
 Failed systemd services: 0
-Non-loopback interfaces administratively up: 1
+Non-loopback interfaces administratively up: 1 (inventory only; carrier state not evaluated)
 Status: healthy
 ```
 
@@ -64,4 +64,4 @@ ICMP: reply received
 Status: healthy
 ```
 
-Exit `1` indicates resolution, routing or ICMP warning; `2` indicates invalid input, an incomplete local query or a missing prerequisite. GNU `timeout` applies the selected limit to resolution and route queries, followed by at most a one-second termination grace; ICMP uses the selected wait directly. A failed ping does not prove the host is down because ICMP may be filtered. The command intentionally does not alter routes, interfaces or resolver settings.
+Exit `1` indicates a resolution, routing or ICMP warning; `2` indicates invalid input, incomplete evidence or a missing prerequisite. Resolution and route collection are bounded by the selected timeout, and malformed collector output is not treated as healthy. A failed ping does not prove the host is down because ICMP may be filtered. The command does not alter routes, interfaces or resolver settings.

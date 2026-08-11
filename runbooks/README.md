@@ -2,6 +2,8 @@
 
 Runbooks provide a short response sequence for common conditions. Start with the observed symptom; do not jump to the similarly named cause.
 
+Use a runbook as a route through an active problem, not as a script to follow blindly. Confirm scope and safety first, record each material result, and move to the linked subject guide when the fault no longer matches the short path. A command succeeding is not the finish point; the affected user or service path must work again and any remaining uncertainty must be handed over.
+
 - [Host unreachable](host-unreachable.md)
 - [Operating system will not boot](os-will-not-boot.md)
 - [Service not running](service-not-running.md)

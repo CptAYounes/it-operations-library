@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7.4
 <#
 .SYNOPSIS
 Reports the current state and configured start mode of Windows services.
@@ -13,7 +13,7 @@ This script does not start, stop or reconfigure services.
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
+    [AllowEmptyString()]
     [string[]]$Name
 )
 
@@ -28,29 +28,47 @@ if ($env:OS -ne 'Windows_NT') {
 $result = 0
 
 foreach ($serviceName in $Name) {
-    if ($serviceName -notmatch '^[A-Za-z0-9_.-]+$') {
-        Write-Output "Service ${serviceName}: invalid name"
+    if ([string]::IsNullOrWhiteSpace($serviceName) -or $serviceName.IndexOfAny([char[]]'*?[]') -ge 0) {
+        Write-Output "Service ${serviceName}: invalid literal name"
         $result = 2
         continue
     }
 
     try {
         $services = @(Get-Service -Name $serviceName -ErrorAction Stop)
+        if ($services.Count -eq 0) {
+            Write-Output "Service ${serviceName}: not found"
+            if ($result -eq 0) {
+                $result = 1
+            }
+            continue
+        }
         if ($services.Count -ne 1) {
             throw "Expected one service record; received $($services.Count)."
         }
         $service = $services[0]
     }
     catch {
-        Write-Output "Service ${serviceName}: unavailable ($($_.Exception.Message))"
-        if ($result -lt 1) {
-            $result = 1
+        if ([string]$_.FullyQualifiedErrorId -like 'NoServiceFoundForGivenName*') {
+            Write-Output "Service ${serviceName}: not found"
+            if ($result -eq 0) {
+                $result = 1
+            }
+        }
+        else {
+            Write-Output "Service ${serviceName}: collection failed ($($_.Exception.Message))"
+            $result = 2
         }
         continue
     }
 
     try {
-        $escapedName = $service.Name.Replace("'", "''")
+        # WQL string literals use backslash escapes rather than SQL quote
+        # doubling. Escape backslashes first so the escapes added for quotes
+        # are not escaped a second time.
+        $escapedName = $service.Name.Replace('\', '\\')
+        $escapedName = $escapedName.Replace("'", "\'")
+        $escapedName = $escapedName.Replace('"', '\"')
         $serviceConfigurations = @(Get-CimInstance -ClassName Win32_Service -Filter "Name = '$escapedName'")
         if ($serviceConfigurations.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$serviceConfigurations[0].StartMode)) {
             throw "Expected one complete service-configuration record; received $($serviceConfigurations.Count)."

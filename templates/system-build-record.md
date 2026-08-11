@@ -68,3 +68,5 @@ Record what was intentionally installed and how the completed machine was checke
 - **Known issues or accepted limitations:**
 - **Follow-up action / owner:**
 - **Build accepted by / date:**
+
+Use the [new system build checklist](../checklists/new-system-build.md) as the corresponding sign-off gate; keep detailed evidence in the approved build record rather than forcing it into this component summary.

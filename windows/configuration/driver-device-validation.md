@@ -69,6 +69,8 @@ WMI/CIM inventory may omit or normalise some fields. Confirm a suspect device in
 
 To inspect a specific package without installing it:
 
+Run these servicing queries from an elevated terminal. They inspect driver metadata but do not install a package.
+
 ```text
 pnputil /enum-drivers
 DISM.exe /Online /Get-DriverInfo /Driver:oemNN.inf

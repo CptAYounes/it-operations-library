@@ -33,7 +33,7 @@ Check whether the service is actually expected to be continuously running. Trigg
 
 ## Observe the failure once
 
-If authority and impact permit, make one controlled start attempt while watching time and error output:
+If authority and impact permit, make one controlled start attempt from an elevated PowerShell session or an account with delegated service-control rights while watching time and error output:
 
 ```powershell
 Start-Service -Name 'ExampleService' -PassThru
@@ -132,6 +132,8 @@ Choose one based on evidence:
 - repair permissions through the owning product/policy;
 - update or roll back the specific application/driver change;
 - restart the service during an approved interruption.
+
+The service-control commands below require an elevated session or explicitly delegated service-control rights.
 
 ```powershell
 Restart-Service -Name 'ExampleService'

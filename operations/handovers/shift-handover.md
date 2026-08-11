@@ -26,7 +26,7 @@ Order content by urgency:
 - change, incident or vendor reference;
 - monitoring or communication still required.
 
-“Investigating server issue” is not a handover. “API node remains removed from rotation after repeated storage timeouts; service is healthy on remaining nodes; storage evidence is linked; platform owner acknowledged and next update is 22:00 UTC” gives state and action without inventing cause.
+“Investigating server issue” is not a handover. A synthetic example is: “API node remains removed from rotation after repeated storage timeouts; service is healthy on remaining nodes; storage evidence is linked; platform owner acknowledged and next update is 22:00 UTC.” This gives state and action without inventing cause.
 
 ## Transfer actively
 

@@ -56,7 +56,7 @@ Set-TimeZone -Id 'GMT Standard Time'
 
 Domain members normally follow the domain time hierarchy; do not point them independently at an internet source without an approved time design. Validate the displayed time, time zone, source and recent successful synchronisation.
 
-## 3. Validate devices before adding software
+## 3. Validate devices before installing software
 
 Follow [W03 — Driver and device validation](driver-device-validation.md). Resolve unknown storage, chipset, display and network devices using Windows Update, the system OEM or the component vendor. Avoid bulk third-party driver tools.
 

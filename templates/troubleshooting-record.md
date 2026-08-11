@@ -1,6 +1,6 @@
 # Troubleshooting record
 
-Copy this template for one investigation. Record observations as they are made; do not rewrite an early hypothesis as if it had always been the cause.
+Copy this template for one investigation and use the [troubleshooting method](../troubleshooting/README.md) when choosing the next check. Record observations as they are made; do not rewrite an early hypothesis as if it had always been the cause.
 
 ## Context
 
@@ -17,7 +17,7 @@ Copy this template for one investigation. Record observations as they are made; 
 
 ## Investigation log
 
-Add one row per check or action. Preserve exact times when sequence matters.
+Use one row per check or action. Preserve exact times when sequence matters.
 
 | Time | Check or action | Evidence / output location | Interpretation | Result |
 |---|---|---|---|---|
@@ -35,8 +35,8 @@ Add one row per check or action. Preserve exact times when sequence matters.
 
 - **Action taken:**
 - **Immediate result:**
-- **Root cause:** Confirmed / suspected / not established
-- **Root-cause detail:**
+- **Cause assessment/detail:**
+- **Cause confidence:** Confirmed / likely / unknown
 - **Recovery validation:**
 - **Monitoring period or follow-up check:**
 - **Escalated to / reason:**

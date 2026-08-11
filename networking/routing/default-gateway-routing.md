@@ -21,6 +21,22 @@ ip rule show
 
 Support for `-DiagnoseRouting` depends on the Windows version. `ip route get` reports a kernel route decision; it does not prove the next hop or destination will reply.
 
+IPv6 uses the same longest-prefix principle. Its default route is `::/0`; the next hop is often learned from router advertisements rather than DHCPv6. Inspect it separately because a host can have working IPv4 routing and broken IPv6 routing:
+
+```powershell
+Get-NetRoute -AddressFamily IPv6 | Sort-Object DestinationPrefix, RouteMetric
+Find-NetRoute -RemoteIPAddress 2001:db8::20
+Get-NetIPInterface -AddressFamily IPv6 |
+    Select-Object InterfaceIndex, InterfaceAlias, ConnectionState, InterfaceMetric
+```
+
+```bash
+ip -6 route
+ip -6 route get 2001:db8::20
+```
+
+`Find-NetRoute` reports the selected source address and route for one destination; a sorted route listing does not reproduce longest-prefix selection. Compare the selected route metric with the interface metric when equivalent routes compete. IPv6 neighbour discovery replaces ARP, and a link-local next-hop address is normal. Keep the outgoing interface or zone with that address when recording evidence.
+
 ## Checks that narrow a gateway problem
 
 1. Confirm interface state, address and prefix.
@@ -39,8 +55,8 @@ Support for `-DiagnoseRouting` depends on the Windows version. `ip route get` re
 - duplicate default routes select an unintended interface;
 - return traffic follows another firewall or lacks a route;
 - a route exists in a different network namespace/VRF than the process;
-- stale instructions add a persistent route that outlives the original need.
+- stale instructions create a persistent route that outlives the original need.
 
 ## Change boundary
 
-Adding a route can divert traffic or remove remote management. Record the current table, source/interface decision and rollback command before an authorised change. Do not “fix” one destination with a broad route when the ownership, prefix or return path is unknown. Validate the original service, route choice, reverse direction and monitoring after correction.
+A new route can divert traffic or remove remote management. Record the current table, source/interface decision and rollback command before an authorised change. Do not “fix” one destination with a broad route when the ownership, prefix or return path is unknown. Validate the original service, route choice, reverse direction and monitoring after correction.
